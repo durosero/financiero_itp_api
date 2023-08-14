@@ -1,0 +1,6 @@
+// please never change the order of this arrray
+export const MESSAGE_RESPONSE = [
+  'Se realizó exitosamente el reverso del pago.',
+  'No se pudo realizar el reverso del pago.',
+  'Ocurrió un error inesperado en la operación.',
+];

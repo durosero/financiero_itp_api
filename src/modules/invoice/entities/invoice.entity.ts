@@ -1,12 +1,16 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ESysApoloStatus } from '../enums/invoice.enum';
 import { DetailInvoice } from './detailInvoice.entity';
 import { DetailPayment } from './detailPayment.entity';
+import { Person } from './person.entity';
 
 @Entity('fin_pago')
 export class Invoice {
@@ -31,8 +35,8 @@ export class Invoice {
   @Column('timestamp', { name: 'fecha', nullable: false })
   fecha: Date;
 
-  @Column({ name: 'estudiante_id', nullable: true })
-  estudianteId: number | null;
+  @Column('varchar', { name: 'estudiante_id', nullable: true })
+  estudianteId: string | null;
 
   @Column({ name: 'matricula_id', nullable: true })
   matriculaId: number | null;
@@ -71,7 +75,7 @@ export class Invoice {
   valorReverso: number | null;
 
   @Column('integer', { name: 'sysapolo_verify', nullable: true })
-  sysapoloVerify: number | null;
+  sysapoloVerify: ESysApoloStatus;
 
   @Column('integer', { name: 'email_send', nullable: true })
   emailSend: number | null;
@@ -81,4 +85,8 @@ export class Invoice {
 
   @OneToMany(() => DetailPayment, (detailPayments) => detailPayments.invoice)
   detailPayments: DetailPayment[];
+
+  @ManyToOne(() => Person, (person) => person.invoices)
+  @JoinColumn([{ name: 'estudiante_id', referencedColumnName: 'id' }])
+  person: Person;
 }

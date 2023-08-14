@@ -1,21 +1,28 @@
-import { Module } from '@nestjs/common';
-import { InvoiceService } from './invoice.service';
-import { InvoiceController } from './invoice.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Invoice } from './entities/invoice.entity';
-import { DetailInvoice } from './entities/detailInvoice.entity';
-import { FormOfPayment } from './entities/formOfPayment.entity';
-import { StatusPayment } from './entities/statusPayment.entity';
-import { Concept } from './entities/concept.entity';
-import { DetailPayment } from './entities/detailPayment.entity';
-import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { EmailService } from '../../services/email.service';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
+import { EConnection } from 'src/constants/database.constant';
 import { AUTH_EMAIL } from 'src/constants/email.constant';
+import { EmailService } from '../../services/email.service';
+import { CashController } from './cash.controller';
+import { Concept } from './entities/concept.entity';
+import { DetailInvoice } from './entities/detailInvoice.entity';
+import { DetailPayment } from './entities/detailPayment.entity';
+import { FormOfPayment } from './entities/formOfPayment.entity';
+import { Invoice } from './entities/invoice.entity';
+import { Person } from './entities/person.entity';
+import { StatusPayment } from './entities/statusPayment.entity';
+import { DetailInvoiceSys } from './entities/SysApolo/detailInvoiceSys.entity';
+import { InvoiceSys } from './entities/SysApolo/invoiceSys.entity';
+import { InvoiceController } from './invoice.controller';
+import { InvoiceService } from './invoice.service';
+import { ValidateTokenMiddleware } from './middlewares/validateToken.middleware';
+import { DetailPaymentRepository } from './repositories/detailPayment.repository';
 
 @Module({
-  controllers: [InvoiceController],
-  providers: [InvoiceService, EmailService],
+  controllers: [InvoiceController, CashController],
+  providers: [InvoiceService, EmailService, DetailPaymentRepository],
   imports: [
     TypeOrmModule.forFeature([
       Invoice,
@@ -24,7 +31,12 @@ import { AUTH_EMAIL } from 'src/constants/email.constant';
       StatusPayment,
       Concept,
       DetailPayment,
+      Person,
     ]),
+    TypeOrmModule.forFeature(
+      [InvoiceSys, DetailInvoiceSys],
+      EConnection.SYSAPOLO,
+    ),
     MailerModule.forRootAsync({
       useFactory: async () => ({
         transport: {
@@ -50,4 +62,11 @@ import { AUTH_EMAIL } from 'src/constants/email.constant';
     }),
   ],
 })
-export class InvoiceModule {}
+export class InvoiceModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ValidateTokenMiddleware).forRoutes({
+      path: 'caja/reverso',
+      method: RequestMethod.POST,
+    });
+  }
+}
