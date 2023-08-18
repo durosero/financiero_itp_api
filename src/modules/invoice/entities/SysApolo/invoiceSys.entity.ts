@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
+@Index('PK_vup_fact_concepto_escolar_encabezado', ['id'], { unique: true })
 @Entity('vup_fact_concepto_escolar_encabezado')
 export class InvoiceSys {
   @PrimaryColumn({ name: 'ide_fact_concepto_enc', type: 'int' })
@@ -9,13 +10,14 @@ export class InvoiceSys {
   numRecibo: number;
 
   @Column({ name: 'fec_recibo', type: 'datetime', nullable: false })
-  fecRecibo: number;
+  fecRecibo: Date;
 
+  @Index('fk_escolar_encabezado_tercero', ['codTercero'])
   @Column({ name: 'cod_ter', type: 'varchar', nullable: false })
   codTercero: string;
 
   @Column({ name: 'ide_usuario', type: 'int', nullable: false })
-  ideUsuario: string;
+  ideUsuario: number;
 
   @Column({ name: 'det_recibo', type: 'varchar', nullable: false })
   detRecibo: string;
@@ -31,6 +33,14 @@ export class InvoiceSys {
 
   @Column({ name: 'pagado', type: 'char', nullable: false })
   pagado: string;
+
+  @Column({
+    name: 'crea_registro',
+    type: 'varchar',
+    nullable: false,
+    default: '1',
+  })
+  creaRegistro: string;
 
   @Column({ name: 'ide_banco', type: 'int', nullable: false })
   ideBanco: number;

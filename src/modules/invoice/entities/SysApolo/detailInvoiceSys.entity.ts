@@ -1,10 +1,21 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+@Index('vup_fact_concepto_escolar_detalle_pk', ['id'], { unique: true })
 @Entity('vup_fact_concepto_escolar_detalle')
 export class DetailInvoiceSys {
-  @PrimaryColumn({ name: 'ide_fact_concepto_det', type: 'int' })
+  @PrimaryColumn({
+    name: 'ide_fact_concepto_det',
+    type: 'int',
+  })
   id: number;
 
+  @Index('fk_con_esc_detalle_enc', ['facturaId'])
   @Column({ name: 'ide_fact_concepto_enc', type: 'int', nullable: false })
   facturaId: number;
 

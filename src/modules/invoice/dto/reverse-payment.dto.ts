@@ -51,5 +51,5 @@ export class ReversePaymentDto {
   @MinLength(1)
   @MaxLength(40)
   @IsNotEmpty()
-  id_transaccion: string;
+  codigo_transaccion: string;
 }

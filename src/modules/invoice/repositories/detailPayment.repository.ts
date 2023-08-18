@@ -1,6 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import { EConnection } from 'src/constants/database.constant';
+import { IPaymentSearch } from 'src/interfaces/payment.interface';
 import { In, Repository } from 'typeorm';
-import { ReversePaymentDto } from '../dto/reverse-payment.dto';
+
 import { DetailPayment } from '../entities/detailPayment.entity';
 import { EStatusInvoice } from '../enums/invoice.enum';
 
@@ -12,29 +14,33 @@ export class DetailPaymentRepository extends Repository<DetailPayment> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  findPaymentsForReverse(payload: ReversePaymentDto) {
+  findPaymentsForReverse(payload: IPaymentSearch) {
+    const { invoiceId, value, transactionCode } = payload;
     return this.repository
       .createQueryBuilder('pm')
-      .where('pm.pago_id = :id', { id: payload.referencia_pago })
-      .andWhere('pm.estado_pago_id = :estadoPago', {
+      .where('pm.facturaId = :id', { id: invoiceId })
+      .andWhere('pm.estadoPagoId = :estadoPago', {
         estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
       })
-      .andWhere('pm.codigo_transaccion = :codigoTransaccion', {
-        codigoTransaccion: payload.id_transaccion,
+      .andWhere('pm.codigoTransaccion = :codigoTransaccion', {
+        codigoTransaccion: transactionCode,
       })
-      .andWhere('pm.valor_pago = :valorPago', {
-        valorPago: payload.valor_pagado,
+      .andWhere('pm.valorPago = :valorPago', {
+        valorPago: value,
       })
       .getMany();
   }
 
-  detetePaymentsByIds(ids: string[]) {
+  findPaymentOkByInvoiceId(invoiceId: number) {
     return this.repository
       .createQueryBuilder('pm')
-      .delete()
-      .where({
-        id: In(ids),
+      .select('pm')
+      .innerJoinAndSelect('pm.bankAccount', 'ba')
+      .innerJoinAndSelect('pm.formOfPayment', 'fp')
+      .where('pm.facturaId = :id', { id: invoiceId })
+      .andWhere('pm.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
       })
-      .execute();
+      .getOne();
   }
 }

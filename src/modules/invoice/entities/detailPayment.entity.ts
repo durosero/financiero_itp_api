@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BankAccount } from './bankAccount.entity';
 import { FormOfPayment } from './formOfPayment.entity';
 import { Invoice } from './invoice.entity';
 import { StatusPayment } from './statusPayment.entity';
@@ -57,11 +58,15 @@ export class DetailPayment {
   )
   @JoinColumn([{ name: 'estado_pago_id', referencedColumnName: 'id' }])
   statusPayment: StatusPayment;
-  
+
   @ManyToOne(
     () => FormOfPayment,
     (formOfPayment) => formOfPayment.detailPayments,
   )
   @JoinColumn([{ name: 'forma_pago_id', referencedColumnName: 'id' }])
   formOfPayment: FormOfPayment;
+
+  @ManyToOne(() => BankAccount, (bankAccount) => bankAccount.detailPayments)
+  @JoinColumn([{ name: 'banco_recaudo_id', referencedColumnName: 'id' }])
+  bankAccount: BankAccount;
 }

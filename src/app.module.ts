@@ -1,18 +1,25 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import config from './config/config';
+import { getEnvirontment } from './config/environments';
 import { EConnection } from './constants/database.constant';
-import { DetailInvoiceSys } from './modules/invoice/entities/SysApolo/detailInvoiceSys.entity';
-import { InvoiceSys } from './modules/invoice/entities/SysApolo/invoiceSys.entity';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: getEnvirontment(),
+      load: [config],
+      isGlobal: true,
+    }),
+
     TypeOrmModule.forRoot({
+      // name: EConnection.SIGEIN,
       type: 'mysql',
       host: process.env.MYSQL_SGD_HOST,
       username: process.env.MYSQL_SGD_USER,
@@ -23,6 +30,28 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
       synchronize: false,
       logging: 'all',
     }),
+
+    // TypeOrmModule.forRootAsync({
+    //   // Use useFactory, useClass, or useExisting
+    //   // to configure the DataSourceOptions.
+    //   inject: [config.KEY, 'DATA_SOURCE'],
+
+    //   useFactory: async (configConstant: ConfigType<typeof config>) => {
+    //     return {
+    //       ...configConstant.database,
+    //       type: 'mssql',
+    //       logging: 'all',
+    //       datasource: '',
+    //     };
+    //   },
+    //   // dataSource receives the configured DataSourceOptions
+    //   // and returns a Promise<DataSource>.
+    //   dataSourceFactory: async (options) => {
+    //     const dataSource = await new DataSource(options).initialize();
+    //     return dataSource;
+    //   },
+    // }),
+
     TypeOrmModule.forRoot({
       name: EConnection.SYSAPOLO,
       type: 'mssql',
@@ -38,9 +67,11 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
       synchronize: false,
       logging: 'all',
     }),
+
     InvoiceModule,
   ],
   controllers: [AppController],
+  exports: [],
   providers: [AppService],
 })
 export class AppModule {}

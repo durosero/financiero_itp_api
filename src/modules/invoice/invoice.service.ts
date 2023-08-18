@@ -1,35 +1,31 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty } from 'lodash';
-import { EConnection } from 'src/constants/database.constant';
-import { DataSource, DeepPartial, In, Repository } from 'typeorm';
+import {
+  IPaymentRegister,
+  IPaymentSearch
+} from 'src/interfaces/payment.interface';
+import { DataSource, DeepPartial, In } from 'typeorm';
 import { EmailService } from '../../services/email.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { DetailPayment } from './entities/detailPayment.entity';
 import { Invoice } from './entities/invoice.entity';
-import { DetailInvoiceSys } from './entities/SysApolo/detailInvoiceSys.entity';
-import { InvoiceSys } from './entities/SysApolo/invoiceSys.entity';
 import {
+  EFormPayment,
   ESeverityCode,
   EStatusInvoice,
   ESysApoloStatus
 } from './enums/invoice.enum';
+import { InvoiceSysService } from './invoiceSys.service';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
-
 @Injectable()
 export class InvoiceService {
   constructor(
     private readonly emailService: EmailService,
+    private readonly invoiceSysService: InvoiceSysService,
     private readonly detailPaymentRepository: DetailPaymentRepository,
     private readonly dataSource: DataSource,
-
-    @InjectRepository(InvoiceSys, EConnection.SYSAPOLO)
-    private invoiceSysRepository: Repository<InvoiceSys>,
-
-    @InjectRepository(DetailInvoiceSys, EConnection.SYSAPOLO)
-    private detailInvoiceSysRepository: Repository<DetailInvoiceSys>,
   ) {}
 
   create(createInvoiceDto: CreateInvoiceDto) {
@@ -47,10 +43,80 @@ export class InvoiceService {
     return this.emailService.sendCustomMail(mailOptions);
   }
 
+  async registerPaymentCash(payload: IPaymentRegister) {
+    const searchData: IPaymentSearch = { ...payload };
+
+    const payments = await this.detailPaymentRepository.findPaymentsForReverse(
+      searchData,
+    );
+
+    // if (!isEmpty(payments)) return;
+
+    const registered = await this.registerPaymentInvoiceSigedin(payload);
+
+    // TODO: register in sysApolo and send EMAIL
+
+    return payments;
+  }
+
+  async registerPaymentInvoiceSigedin(
+    payload: IPaymentRegister,
+  ): Promise<boolean> {
+    const { invoiceId, value, transactionCode, status, date, bankId } = payload;
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const payment: DeepPartial<DetailPayment> = {
+        facturaId: invoiceId,
+        valorPago: value,
+        totalPago: value,
+        fecha: date,
+        estadoPagoId: status,
+        formaPagoId: EFormPayment.EFECTIVO,
+        codigoTransaccion: transactionCode,
+        bancoRecaudoId: bankId,
+        nombreBanco: 'BANCO POPULAR',
+      };
+
+      const invoice: DeepPartial<Invoice> = {
+        estadoId: EStatusInvoice.PAGO_FINALIZADO_OK,
+        fechaUpdate: new Date(),
+        isOnline: 0,
+      };
+
+      await queryRunner.manager.insert(DetailPayment, payment);
+
+      await queryRunner.manager.update(
+        Invoice,
+        {
+          id: invoiceId,
+        },
+        invoice,
+      );
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return true;
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      return false;
+    }
+  }
+
   // Main reverse payment
   async reversePayment(payload: ReversePaymentDto): Promise<ESeverityCode> {
+    const searchData: IPaymentSearch = {
+      invoiceId: payload.referencia_pago,
+      transactionCode: payload.codigo_transaccion,
+      value: payload.valor_pagado,
+    };
+
     const payments = await this.detailPaymentRepository.findPaymentsForReverse(
-      payload,
+      searchData,
     );
 
     if (isEmpty(payments)) return ESeverityCode.WARNING;
@@ -58,7 +124,7 @@ export class InvoiceService {
 
     const deleted = await this.deletePaymentInvoiceSigedin(payload, ids);
     if (deleted) {
-      this.deleteInvoiceSysApolo(payload.referencia_pago);
+      this.invoiceSysService.deleteInvoiceSysApolo(payload.referencia_pago);
       return ESeverityCode.INFORMATIVE;
     }
 
@@ -102,21 +168,6 @@ export class InvoiceService {
       console.log(error);
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
-      return false;
-    }
-  }
-
-  async deleteInvoiceSysApolo(invoiceId: number): Promise<boolean> {
-    try {
-      const invoiceSys = await this.invoiceSysRepository.findOne({
-        where: { numRecibo: invoiceId },
-      });
-      await this.detailInvoiceSysRepository.delete({
-        facturaId: invoiceSys.id,
-      });
-      await this.invoiceSysRepository.delete({ id: invoiceSys.id });
-      return true;
-    } catch (error) {
       return false;
     }
   }

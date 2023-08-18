@@ -6,23 +6,37 @@ import { EConnection } from 'src/constants/database.constant';
 import { AUTH_EMAIL } from 'src/constants/email.constant';
 import { EmailService } from '../../services/email.service';
 import { CashController } from './cash.controller';
+import { BankAccount } from './entities/bankAccount.entity';
+import { CategoryInvoice } from './entities/categoryInvoice.entity';
 import { Concept } from './entities/concept.entity';
 import { DetailInvoice } from './entities/detailInvoice.entity';
 import { DetailPayment } from './entities/detailPayment.entity';
+import { DocumentType } from './entities/documentType.entity';
 import { FormOfPayment } from './entities/formOfPayment.entity';
 import { Invoice } from './entities/invoice.entity';
 import { Person } from './entities/person.entity';
 import { StatusPayment } from './entities/statusPayment.entity';
 import { DetailInvoiceSys } from './entities/SysApolo/detailInvoiceSys.entity';
 import { InvoiceSys } from './entities/SysApolo/invoiceSys.entity';
+import { PaymentPointSys } from './entities/SysApolo/paymentPointSys.entity';
+import { ThirdPartySys } from './entities/SysApolo/thirdPartySys.entity';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './invoice.service';
+import { InvoiceSysService } from './invoiceSys.service';
 import { ValidateTokenMiddleware } from './middlewares/validateToken.middleware';
+import { databaseProviders } from './providers/database.provider';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
+import { InvoiceRepository } from './repositories/invoice.repository';
 
 @Module({
   controllers: [InvoiceController, CashController],
-  providers: [InvoiceService, EmailService, DetailPaymentRepository],
+  providers: [
+    InvoiceService,
+    EmailService,
+    InvoiceSysService,
+    DetailPaymentRepository,
+    InvoiceRepository,
+  ],
   imports: [
     TypeOrmModule.forFeature([
       Invoice,
@@ -32,9 +46,13 @@ import { DetailPaymentRepository } from './repositories/detailPayment.repository
       Concept,
       DetailPayment,
       Person,
+      DocumentType,
+      CategoryInvoice,
+      BankAccount,
     ]),
+
     TypeOrmModule.forFeature(
-      [InvoiceSys, DetailInvoiceSys],
+      [InvoiceSys, DetailInvoiceSys, ThirdPartySys, PaymentPointSys],
       EConnection.SYSAPOLO,
     ),
     MailerModule.forRootAsync({

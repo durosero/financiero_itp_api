@@ -1,20 +1,23 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ESysApoloStatus } from '../enums/invoice.enum';
+import { EEmailStatus, ESysApoloStatus } from '../enums/invoice.enum';
+import { CategoryInvoice } from './categoryInvoice.entity';
 import { DetailInvoice } from './detailInvoice.entity';
 import { DetailPayment } from './detailPayment.entity';
 import { Person } from './person.entity';
 
+@Index('PRIMARY', ['id'], { unique: true })
 @Entity('fin_pago')
 export class Invoice {
-  @PrimaryGeneratedColumn('increment', { name: '_id' })
+  @PrimaryColumn({ name: '_id' })
   id: number;
 
   @Column({ name: 'codigo' })
@@ -35,6 +38,7 @@ export class Invoice {
   @Column('timestamp', { name: 'fecha', nullable: false })
   fecha: Date;
 
+  @Index('fk_pago_estudiante_1', ['estudianteId'])
   @Column('varchar', { name: 'estudiante_id', nullable: true })
   estudianteId: string | null;
 
@@ -74,11 +78,21 @@ export class Invoice {
   @Column('decimal', { name: 'valor_reverso', nullable: true })
   valorReverso: number | null;
 
-  @Column('integer', { name: 'sysapolo_verify', nullable: true })
+  @Column('enum', {
+    name: 'sysapolo_verify',
+    nullable: true,
+    enum: ESysApoloStatus,
+    default: ESysApoloStatus.PENDIENTE,
+  })
   sysapoloVerify: ESysApoloStatus;
 
-  @Column('integer', { name: 'email_send', nullable: true })
-  emailSend: number | null;
+  @Column('enum', {
+    name: 'email_send',
+    nullable: true,
+    enum: EEmailStatus,
+    default: EEmailStatus.PENDIENTE,
+  })
+  emailSend: EEmailStatus;
 
   @OneToMany(() => DetailInvoice, (detailInvoice) => detailInvoice.invoice)
   detailInvoices: DetailInvoice[];
@@ -89,4 +103,11 @@ export class Invoice {
   @ManyToOne(() => Person, (person) => person.invoices)
   @JoinColumn([{ name: 'estudiante_id', referencedColumnName: 'id' }])
   person: Person;
+
+  @ManyToOne(
+    () => CategoryInvoice,
+    (categoryInvoice) => categoryInvoice.invoices,
+  )
+  @JoinColumn([{ name: 'categoria_pago_id', referencedColumnName: 'id' }])
+  categoryInvoice: CategoryInvoice;
 }
