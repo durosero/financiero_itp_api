@@ -2,7 +2,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EConnection } from 'src/constants/database.constant';
 import { DeepPartial, Repository } from 'typeorm';
 import { Invoice } from '../entities/invoice.entity';
-import { EEmailStatus, ESysApoloStatus } from '../enums/invoice.enum';
+import {
+  EEmailStatus,
+  EStatusInvoice,
+  ESysApoloStatus,
+} from '../enums/invoice.enum';
 
 export class InvoiceRepository extends Repository<Invoice> {
   constructor(
@@ -28,6 +32,30 @@ export class InvoiceRepository extends Repository<Invoice> {
       .innerJoinAndSelect('dtIv.concept', 'cnp')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .where('inv.id = :invoiceId', { invoiceId })
+      .getOne();
+  }
+
+  findFullById(invoiceId: number) {
+    return this.repository
+      .createQueryBuilder('inv')
+      .select([
+        'inv.id',
+        'inv.codigoBarras',
+        'inv.estadoId',
+        'inv.jsonResponse',
+        'inv.estudianteId',
+        'inv.fechaUpdate',
+      ])
+      .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
+      .innerJoinAndSelect('inv.detailPayments', 'dtPay')
+      .innerJoinAndSelect('dtIv.concept', 'cnp')
+      .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
+      .innerJoinAndSelect('dtPay.formOfPayment', 'frPI')
+      .innerJoinAndSelect('dtPay.statusPayment', 'stp')
+      .where('inv.id = :invoiceId', { invoiceId })
+      .andWhere('dtPay.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
+      })
       .getOne();
   }
 

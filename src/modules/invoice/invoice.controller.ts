@@ -1,30 +1,26 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Header, Param, StreamableFile } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
-import { enviaMail } from 'src/utils/nodemailer.util';
 
 @Controller('invoice')
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
-  @Post()
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoiceService.create(createInvoiceDto);
+  @Get('payment/pdf/:id')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'inline; filename=file.pdf')
+  async getPdfPaymentReceipt(@Param('id') invoiceId: number) {
+    const buffer = await this.invoiceService.getPdfPaymentReceipt(invoiceId);
+    return new StreamableFile(buffer);
   }
 
-  @Get()
-  findAll() {
-    return this.invoiceService.findAll();
+  @Get('payment/html/:id')
+  @Header('content-type', 'text/html')
+  async getHTMLPaymentReceipt(@Param('id') invoiceId: number) {
+    return this.invoiceService.getHTMLPaymentReceipt(invoiceId);
+  }
+  @Get('payment/email/:id')
 
-    // return enviaMail();
+  async getEmail(@Param('id') invoiceId: number) {
+    return this.invoiceService.equide(invoiceId);
   }
 }

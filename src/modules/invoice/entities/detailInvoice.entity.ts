@@ -31,6 +31,8 @@ export class DetailInvoice {
   @Column('integer', { name: 'cantidad', nullable: false })
   cantidad: number;
 
+  subtotal?: number | null;
+
   @ManyToOne(() => Invoice, (invoice) => invoice.detailInvoices)
   @JoinColumn([{ name: 'pago_id', referencedColumnName: 'id' }])
   invoice: Invoice;

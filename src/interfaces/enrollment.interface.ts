@@ -21,10 +21,10 @@ export interface IEnrollment {
 }
 
 export interface IStudent {
-  cod_matricula: number; // 77289,
+  cod_matricula: number | null; // 77289,
   cod_doc: number; // 1,
   tipo_doc: string; // "CC",
-  nom_estadomatricula: string; // "ADMITIDO",
+  nom_estadomatricula: string | null; // "ADMITIDO",
   ide_persona: number; // "1124863016",
   ape1_persona: string; // "LOZADA",
   ape2_persona: string; // "ALVAREZ",
@@ -39,7 +39,7 @@ export interface IStudent {
   nom_nivel_educativo: string; // "TECNOLOGIA EN OBRAS CIVILES",
   cod_nivel_educativo: number; // 30,
   cod_nivel_edu: number; // 6,
-  nro_creditos: number; // 6,
+  nro_creditos: number | null; // 6,
   ide_genero: string; // "M",
   cod_municipio: string; // "86001",
   dir_persona: string; // "C6"

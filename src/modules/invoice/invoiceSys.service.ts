@@ -51,17 +51,14 @@ export class InvoiceSysService {
   ) {}
 
   // Main register Invoice
-  async registerInvoiceSysApolo(invoiceId: number): Promise<boolean> {
+  async registerInvoiceSysApolo(invoice: Invoice): Promise<boolean> {
     const dataSource = await databaseProviders.useFactory();
     const queryRunner = dataSource.createQueryRunner();
 
     //TODO: si la factura ya esta en sysApolo se debe borrar y crear nuevamente
 
-    const invoice = await this.invoiceRepository.findById(invoiceId);
-    const { person } = invoice;
+    const { person, id: invoiceId } = invoice;
     let codTer: string = '00000';
-
-    if (!invoice) throw new NotFoundError('Factura no encontrada');
 
     const invoiceSys = await this.invoiceSysRepository.findOne({
       where: { numRecibo: invoiceId },

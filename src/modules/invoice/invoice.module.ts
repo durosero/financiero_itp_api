@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { EConnection } from 'src/constants/database.constant';
 import { AUTH_EMAIL } from 'src/constants/email.constant';
-import { EmailService } from '../../services/email.service';
 import { CashController } from './cash.controller';
 import { BankAccount } from './entities/bankAccount.entity';
 import { CategoryInvoice } from './entities/categoryInvoice.entity';
@@ -32,7 +31,6 @@ import { InvoiceRepository } from './repositories/invoice.repository';
   controllers: [InvoiceController, CashController],
   providers: [
     InvoiceService,
-    EmailService,
     InvoiceSysService,
     DetailPaymentRepository,
     InvoiceRepository,

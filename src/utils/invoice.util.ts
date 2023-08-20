@@ -43,3 +43,14 @@ export const calcularSubTotal = (detInvoice: DetailInvoice): number => {
   const subtotalGeneral = subtotal + subtotal * aumento;
   return subtotalGeneral - subtotalGeneral * descuento;
 };
+
+export const llenarSubTotal = (
+  detInvoice: DetailInvoice[],
+): DetailInvoice[] => {
+  return detInvoice.map((detail) => {
+    return {
+      ...detail,
+      subtotal: calcularSubTotal(detail),
+    };
+  });
+};

@@ -1,12 +1,18 @@
-import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import axios from 'axios';
-import e from 'express';
 import * as moment from 'moment';
 import { NotFoundError } from 'src/classes/httpError/notFounError';
 import { IPaymentRegister } from 'src/interfaces/payment.interface';
 import { IReponsePayment } from 'src/interfaces/responseInvoice.interface';
 import { MESSAGE_RESPONSE } from './constant/invoice.constant';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { ValidateInvoiceDto } from './dto/validate-invoice.dto';
 import { ESeverity } from './enums/invoice.enum';
@@ -21,46 +27,25 @@ export class CashController {
     private readonly invoiceRepository: InvoiceRepository,
   ) {}
 
-  @Post()
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoiceService.create(createInvoiceDto);
-  }
-
-  @Get('/consultarfactura')
-  findAll(
-    // @Query('id_banco', ParseIntPipe) idBank: number,
-    // @Query('referencia_pago') refPayment: string,
-    @Query() payload: ValidateInvoiceDto,
-  ) {
-    return {
-      ...payload,
-    };
-
-    // return enviaMail();
-  }
-
   @Get('/notificacion')
   @HttpCode(200)
-  async notificacionFactura(@Query() payload: ValidateInvoiceDto) {
-    // return res.send();
+  async notificacionFactura(@Query() payload: ValidateInvoiceDto, @Res() res) {
+    const invoice = await this.invoiceRepository.findById(
+      Number(payload.referencia_pago),
+    );
+    if (!invoice) throw new NotFoundError('Factura no encontrada');
 
     const responsePayment = await this.getStatusInvoicePayment(payload);
-
     if (!responsePayment)
       throw new NotFoundError('No se encontraron pagos en el banco');
 
     const registerInvoice = await this.invoiceService.registerPaymentCash(
-      responsePayment,
+      responsePayment,invoice
     );
 
-    const respSysRegister =
-      await this.invoiceSysService.registerInvoiceSysApolo(
-        Number(payload.referencia_pago),
-      );
+    this.invoiceSysService.registerInvoiceSysApolo(invoice);
 
-    //TODO: send email and update status
-
-    return respSysRegister;
+    return res.send();
   }
 
   @Post('/reverso')
@@ -82,7 +67,7 @@ export class CashController {
     try {
       // const resp  = await  axios.get<IReponsePayment>('https://api-colombia.com/api/v1/Department');
       const { data, status } = await axios.get(
-        'https://api-colombia.com/api/v1/Departments',
+        'https://api-colombia.com/api/v1/Department',
         {
           headers: {
             Accept: 'application/json',
@@ -92,13 +77,14 @@ export class CashController {
           },
         },
       );
+      console.log(data);
 
       const paymentResponse: IReponsePayment = {
-        referencia_pago: '6945',
+        referencia_pago: referencia_pago,
         estado_pago: 1,
-        valor_pagado: 220000,
-        codigo_transaccion: '1308276574',
-        fecha: '01/02/2022 16:13:49',
+        valor_pagado: 13470,
+        codigo_transaccion: '1970816193',
+        fecha: '15/03/2023 09:47:25',
       };
 
       const parseResponse: IPaymentRegister = {

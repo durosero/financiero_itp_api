@@ -1,13 +1,24 @@
-import { ISendMailOptions } from '@nestjs-modules/mailer';
+import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { isEmpty } from 'lodash';
+import Mail from 'nodemailer/lib/mailer';
+import { resolve } from 'path';
+import * as puppeteer from 'puppeteer';
+import { messageEmailPaymentOk } from 'src/utils/messages.util';
 import {
-  IPaymentRegister,
-  IPaymentSearch
-} from 'src/interfaces/payment.interface';
+  compileHBS,
+  convertHTMLtoPDF,
+  initializeHelpersHbs,
+} from 'src/utils/reportPdf.util';
 import { DataSource, DeepPartial, In } from 'typeorm';
-import { EmailService } from '../../services/email.service';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
+import { IInfoInvoice } from '../../interfaces/enrollment.interface';
+import {
+  IPaymentReceipt,
+  IPaymentRegister,
+  IPaymentSearch,
+} from '../../interfaces/payment.interface';
+
+import { calcularTotales, llenarSubTotal } from '../../utils/invoice.util';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { DetailPayment } from './entities/detailPayment.entity';
 import { Invoice } from './entities/invoice.entity';
@@ -15,48 +26,88 @@ import {
   EFormPayment,
   ESeverityCode,
   EStatusInvoice,
-  ESysApoloStatus
+  ESysApoloStatus,
 } from './enums/invoice.enum';
 import { InvoiceSysService } from './invoiceSys.service';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
+import { InvoiceRepository } from './repositories/invoice.repository';
 @Injectable()
 export class InvoiceService {
   constructor(
-    private readonly emailService: EmailService,
     private readonly invoiceSysService: InvoiceSysService,
     private readonly detailPaymentRepository: DetailPaymentRepository,
+    private readonly invoiceRepository: InvoiceRepository,
     private readonly dataSource: DataSource,
+    private mailerService: MailerService,
   ) {}
 
-  create(createInvoiceDto: CreateInvoiceDto) {
-    return 'This action adds a new invoice';
-  }
-
-  findAll() {
-    const mailOptions: ISendMailOptions = {
-      to: 'durosero@itp.edu.co',
-      subject: 'Mensaje de prueba',
-      text: 'hola mundo',
-      // attachments: fileBuffer,
-    };
-
-    return this.emailService.sendCustomMail(mailOptions);
-  }
-
-  async registerPaymentCash(payload: IPaymentRegister) {
+  async registerPaymentCash(payload: IPaymentRegister, invoice: Invoice) {
     const searchData: IPaymentSearch = { ...payload };
 
     const payments = await this.detailPaymentRepository.findPaymentsForReverse(
       searchData,
     );
 
-    // if (!isEmpty(payments)) return;
-
+    if (!isEmpty(payments)) return true;
     const registered = await this.registerPaymentInvoiceSigedin(payload);
 
-    // TODO: register in sysApolo and send EMAIL
+    if (registered) {
+      const { person, categoryInvoice } = invoice;
 
-    return payments;
+      this.getPdfPaymentReceipt(searchData.invoiceId)
+        .then((buffer) => {
+          const attachment: Mail.Attachment = {
+            content: buffer,
+            filename: `${person.id}-${searchData.transactionCode}.pdf`,
+            contentType: 'application/pdf',
+          };
+          const mailOptions: ISendMailOptions = {
+            to:
+              process.env.APP_ENV != 'pro'
+                ? process.env.EMAIL_TEST
+                : person.email,
+            subject: 'Recibo de pago - Pago exitoso',
+            text: messageEmailPaymentOk(
+              person,
+              categoryInvoice.descripcion,
+              invoice.id,
+            ),
+            attachments: [attachment],
+          };
+
+          this.mailerService.sendMail(mailOptions);
+        })
+        .catch((error) => {
+          console.log('No se ha podido generar el pdf: ', error);
+        });
+    }
+
+    return registered;
+  }
+
+  async equide(invoiceId: number) {
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+
+    const buffer = await this.getPdfPaymentReceipt(invoiceId);
+    const { person, categoryInvoice } = invoice;
+
+    const attachment: Mail.Attachment = {
+      content: buffer,
+      filename: `${invoiceId}.pdf`,
+      contentType: 'application/pdf',
+    };
+    const mailOptions: ISendMailOptions = {
+      to: process.env.APP_ENV != 'pro' ? process.env.EMAIL_TEST : person.email,
+      subject: 'Recibo de pago - Pago exitoso',
+      text: messageEmailPaymentOk(
+        person,
+        categoryInvoice.descripcion,
+        invoiceId,
+      ),
+      attachments: [attachment],
+    };
+
+    return await this.mailerService.sendMail(mailOptions);
   }
 
   async registerPaymentInvoiceSigedin(
@@ -170,5 +221,46 @@ export class InvoiceService {
       await queryRunner.release();
       return false;
     }
+  }
+
+  async getDetailInvoice(invoiceId: number) {
+    return this.invoiceRepository.findFullById(invoiceId);
+  }
+
+  async getHTMLPaymentReceipt(invoiceId: number): Promise<string> {
+    const {
+      jsonResponse,
+      categoryInvoice,
+      detailInvoices,
+      detailPayments,
+      ...invoice
+    } = await this.invoiceRepository.findFullById(invoiceId);
+
+    const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
+    const { totalExtraordinario: total } = calcularTotales(detailInvoices);
+
+    const dataReport: IPaymentReceipt = {
+      client: info_cliente,
+      category: categoryInvoice,
+      detailInvoice: llenarSubTotal(detailInvoices),
+      detailPayment: detailPayments,
+      invoice,
+      totalInt: total,
+    };
+    const pathTemplateBody = resolve(
+      __dirname,
+      '../../',
+      'templates/reciboPago.pdf.hbs',
+    );
+
+    initializeHelpersHbs();
+    const templateHtml = compileHBS(pathTemplateBody, dataReport);
+    return templateHtml;
+  }
+
+  async getPdfPaymentReceipt(invoiceId: number): Promise<Buffer> {
+    const templateHtml = await this.getHTMLPaymentReceipt(invoiceId);
+    const buffer = await convertHTMLtoPDF(templateHtml);
+    return buffer;
   }
 }
