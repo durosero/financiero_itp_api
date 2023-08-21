@@ -60,6 +60,7 @@ export class Invoice {
   @Column({ name: 'is_online', nullable: true })
   isOnline: number | null;
 
+  @Index('fk_cat_pago_1', ['categoriaPagoId'])
   @Column({ name: 'categoria_pago_id', nullable: true })
   categoriaPagoId: number | null;
 

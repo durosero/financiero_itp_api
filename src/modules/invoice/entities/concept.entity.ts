@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { DetailInvoice } from './detailInvoice.entity';
+import { PackageDetail } from './packageDetail.entity';
 
 @Entity('fin_concepto')
 export class Concept {
@@ -17,4 +18,7 @@ export class Concept {
 
   @OneToMany(() => DetailInvoice, (detailInvoice) => detailInvoice.invoice)
   detailInvoices: DetailInvoice[];
+
+  @OneToMany(() => PackageDetail, (packageDetail) => packageDetail.concept)
+  packageDetail: PackageDetail[];
 }

@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -15,6 +16,7 @@ export class DetailPayment {
   @PrimaryGeneratedColumn('uuid', { name: '_id' })
   id: string;
 
+  @Index('fk_det_pago_pago', ['facturaId'])
   @Column({ name: 'pago_id', nullable: false })
   facturaId: number;
 
@@ -30,9 +32,11 @@ export class DetailPayment {
   @Column('datetime', { name: 'fecha', nullable: false })
   fecha: Date;
 
+  @Index('fk_estado_pago', ['estadoPagoId'])
   @Column('integer', { name: 'estado_pago_id', nullable: false })
   estadoPagoId: number;
 
+  @Index('fk_forma_pago', ['formaPagoId'])
   @Column('integer', { name: 'forma_pago_id', nullable: false })
   formaPagoId: number;
 
@@ -45,6 +49,7 @@ export class DetailPayment {
   @Column('varchar', { name: 'ticketID', nullable: true })
   ticketID: string | null;
 
+  @Index('fk_banco_recaudo', ['bancoRecaudoId'])
   @Column('varchar', { name: 'banco_recaudo_id', nullable: true })
   bancoRecaudoId: number | null;
 

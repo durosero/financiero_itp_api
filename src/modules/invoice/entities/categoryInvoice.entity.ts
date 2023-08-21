@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { DetailInvoice } from './detailInvoice.entity';
 import { Invoice } from './invoice.entity';
+import { Package } from './package.entity';
 
 @Entity('fin_categoria_pago')
 export class CategoryInvoice {
@@ -12,4 +13,7 @@ export class CategoryInvoice {
 
   @OneToMany(() => Invoice, (invoice) => invoice.categoryInvoice)
   invoices: Invoice[];
+
+  @OneToMany(() => Package, (packagee) => packagee.category)
+  packages: Package[];
 }
