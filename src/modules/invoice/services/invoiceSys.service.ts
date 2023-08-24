@@ -2,34 +2,34 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty } from 'lodash';
 import * as moment from 'moment';
-import { NotFoundError } from 'src/classes/httpError/notFounError';
-import { UnprocessableEntity } from 'src/classes/httpError/unProcessableEntity';
+import { NotFoundError } from '../../../classes/httpError/notFounError';
+import { UnprocessableEntity } from '../../../classes/httpError/unProcessableEntity';
 
-import { EConnection } from 'src/constants/database.constant';
+import { EConnection } from '../../../constants/database.constant';
 import { DeepPartial, EntityManager, QueryRunner, Repository } from 'typeorm';
-import { IInfoInvoice } from '../../interfaces/enrollment.interface';
-import { IDescriptionSys } from '../../interfaces/payment.interface';
+import { IInfoInvoice } from '../../../interfaces/enrollment.interface';
+import { IDescriptionSys } from '../../../interfaces/payment.interface';
 import {
   calcularSubTotal,
   generateDescriptionSys,
-} from '../../utils/invoice.util';
-import { getVerificationGigit } from '../../utils/nitConverter.util';
+} from '../../../utils/invoice.util';
+import { getVerificationGigit } from '../../../utils/nitConverter.util';
 import {
   COD_DET_FACTURA_SQL,
   COD_FACTURA_SQL,
   COD_TERCERO_SQL,
-} from './constant/invoice.constant';
-import { Invoice } from './entities/invoice.entity';
-import { Person } from './entities/person.entity';
-import { DetailInvoiceSys } from './entities/SysApolo/detailInvoiceSys.entity';
-import { InvoiceSys } from './entities/SysApolo/invoiceSys.entity';
-import { PaymentPointSys } from './entities/SysApolo/paymentPointSys.entity';
-import { ThirdPartySys } from './entities/SysApolo/thirdPartySys.entity';
-import { ESysApoloStatus } from './enums/invoice.enum';
-import { InvoiceService } from './invoice.service';
-import { databaseProviders } from './providers/database.provider';
-import { DetailPaymentRepository } from './repositories/detailPayment.repository';
-import { InvoiceRepository } from './repositories/invoice.repository';
+} from '../constant/invoiceSql.constant';
+
+import { Invoice } from '../entities/invoice.entity';
+import { Person } from '../entities/person.entity';
+import { DetailInvoiceSys } from '../entities/SysApolo/detailInvoiceSys.entity';
+import { InvoiceSys } from '../entities/SysApolo/invoiceSys.entity';
+import { PaymentPointSys } from '../entities/SysApolo/paymentPointSys.entity';
+import { ThirdPartySys } from '../entities/SysApolo/thirdPartySys.entity';
+import { ESysApoloStatus } from '../enums/invoice.enum';
+import { databaseProviders } from '../providers/database.provider';
+import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
+import { InvoiceRepository } from '../repositories/invoice.repository';
 
 @Injectable()
 export class InvoiceSysService {
