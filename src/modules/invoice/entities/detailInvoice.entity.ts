@@ -3,8 +3,9 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from 'typeorm';
+import { ColumnNumericTransformer } from '../../../classes/columnNumericTransformer';
 import { Concept } from './concept.entity';
 import { Invoice } from './invoice.entity';
 
@@ -19,13 +20,25 @@ export class DetailInvoice {
   @Column({ name: 'concepto_id', nullable: false })
   conceptoId: number;
 
-  @Column('decimal', { name: 'descuento', nullable: false })
+  @Column('decimal', {
+    name: 'descuento',
+    nullable: false,
+    transformer: new ColumnNumericTransformer(),
+  })
   descuento: number;
 
-  @Column('decimal', { name: 'aumento', nullable: false })
+  @Column('decimal', {
+    name: 'aumento',
+    nullable: false,
+    transformer: new ColumnNumericTransformer(),
+  })
   aumento: number;
 
-  @Column('decimal', { name: 'valor_unidad', nullable: false })
+  @Column('decimal', {
+    name: 'valor_unidad',
+    nullable: false,
+    transformer: new ColumnNumericTransformer(),
+  })
   valorUnidad: number;
 
   @Column('integer', { name: 'cantidad', nullable: false })

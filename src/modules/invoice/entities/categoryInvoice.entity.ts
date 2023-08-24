@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { DetailInvoice } from './detailInvoice.entity';
 import { Invoice } from './invoice.entity';
 import { Package } from './package.entity';
 

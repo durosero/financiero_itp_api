@@ -5,6 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Discounts } from './discounts.entity';
 import { Package } from './package.entity';
 
 @Index('PRIMARY', ['id'], { unique: true })
@@ -35,6 +36,9 @@ export class PackageConfiguration {
   @Column({ name: 'estado', nullable: false, type: 'integer', default: 0 })
   estado: number;
 
+  @Column({ name: 'fecha_creacion', nullable: false, type: 'datetime' })
+  fechaCreacion: Date;
+
   @Column({
     name: 'porcentaje_ext',
     nullable: false,
@@ -45,4 +49,7 @@ export class PackageConfiguration {
 
   @OneToMany(() => Package, (packagee) => packagee.config)
   packages: Package[];
+
+  @OneToMany(() => Discounts, (discounts) => discounts.config)
+  discounts: Discounts[];
 }

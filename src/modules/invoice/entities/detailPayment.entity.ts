@@ -4,8 +4,9 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from 'typeorm';
+import { ColumnNumericTransformer } from '../../../classes/columnNumericTransformer';
 import { BankAccount } from './bankAccount.entity';
 import { FormOfPayment } from './formOfPayment.entity';
 import { Invoice } from './invoice.entity';
@@ -20,10 +21,18 @@ export class DetailPayment {
   @Column({ name: 'pago_id', nullable: false })
   facturaId: number;
 
-  @Column('decimal', { name: 'valor_pago', nullable: false })
+  @Column('decimal', {
+    name: 'valor_pago',
+    nullable: false,
+    transformer: new ColumnNumericTransformer(),
+  })
   valorPago: number;
 
-  @Column('decimal', { name: 'total_pago', nullable: false })
+  @Column('decimal', {
+    name: 'total_pago',
+    nullable: false,
+    transformer: new ColumnNumericTransformer(),
+  })
   totalPago: number;
 
   @Column('integer', { name: 'int_n_pago', nullable: true })
