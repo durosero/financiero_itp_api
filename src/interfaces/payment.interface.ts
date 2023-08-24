@@ -1,8 +1,8 @@
-import { CategoryInvoice } from 'src/modules/invoice/entities/categoryInvoice.entity';
-import { DetailInvoice } from 'src/modules/invoice/entities/detailInvoice.entity';
-import { DetailPayment } from 'src/modules/invoice/entities/detailPayment.entity';
-import { Invoice } from 'src/modules/invoice/entities/invoice.entity';
-import { EStatusInvoice } from 'src/modules/invoice/enums/invoice.enum';
+import { CategoryInvoice } from '../modules/invoice/entities/categoryInvoice.entity';
+import { DetailInvoice } from '../modules/invoice/entities/detailInvoice.entity';
+import { DetailPayment } from '../modules/invoice/entities/detailPayment.entity';
+import { Invoice } from '../modules/invoice/entities/invoice.entity';
+import { EStatusInvoice } from '../modules/invoice/enums/invoice.enum';
 import { IStudent } from './enrollment.interface';
 
 export interface IPaymentSearch {

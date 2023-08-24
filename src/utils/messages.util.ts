@@ -1,4 +1,4 @@
-import { Person } from 'src/modules/invoice/entities/person.entity';
+import { Person } from '../modules/invoice/entities/person.entity';
 
 export const messageEmailPaymentOk = (
   person: Person,

@@ -1,11 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { EConnection } from 'src/constants/database.constant';
 import { DeepPartial, Repository } from 'typeorm';
 import { Invoice } from '../entities/invoice.entity';
 import {
   EEmailStatus,
   EStatusInvoice,
-  ESysApoloStatus,
+  ESysApoloStatus
 } from '../enums/invoice.enum';
 
 export class InvoiceRepository extends Repository<Invoice> {
@@ -25,10 +24,14 @@ export class InvoiceRepository extends Repository<Invoice> {
         'inv.estadoId',
         'inv.jsonResponse',
         'inv.estudianteId',
+        'inv.categoriaPagoId',
+        'inv.matriculaId',
+        'inv.codPaquete',
       ])
       .innerJoinAndSelect('inv.person', 'per')
       .innerJoinAndSelect('per.documentType', 'dt')
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
+      .leftJoinAndSelect('inv.detailPayments', 'dtPay')
       .innerJoinAndSelect('dtIv.concept', 'cnp')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .where('inv.id = :invoiceId', { invoiceId })
@@ -45,6 +48,9 @@ export class InvoiceRepository extends Repository<Invoice> {
         'inv.jsonResponse',
         'inv.estudianteId',
         'inv.fechaUpdate',
+        'inv.categoriaPagoId',
+        'inv.matriculaId',
+        'inv.codPaquete',
       ])
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
       .innerJoinAndSelect('inv.detailPayments', 'dtPay')

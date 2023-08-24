@@ -2,10 +2,9 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  NestMiddleware,
+  NestMiddleware
 } from '@nestjs/common';
-import { log } from 'console';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 @Injectable()
 export class ValidateTokenMiddleware implements NestMiddleware {

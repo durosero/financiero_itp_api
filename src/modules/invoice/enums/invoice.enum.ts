@@ -9,6 +9,11 @@ export enum ESysApoloStatus {
   PENDIENTE = '0',
 }
 
+export enum EOnlinePayment {
+  SI = 1,
+  NO = 0,
+}
+
 export enum EEmailStatus {
   ENVIADO = '1',
   PENDIENTE = '0',
@@ -30,4 +35,48 @@ export enum EFormPayment {
   PSE = 29,
   EFECTIVO = 99,
   TC = 32,
+}
+
+export enum ECategoryInvoice {
+  OTROS = 0,
+  MATRICULA = 1,
+  HABILITACIONES_SUPLETORIOS = 4,
+  INSCRIPCION = 5,
+  REINGRESO = 6,
+  CREDITO_ADICIONAL = 7,
+  GRADO = 8,
+  CERTIFICADOS_CONSTANCIAS = 9,
+  HOMOLOGACIONES = 10,
+  CARNET_INSTITUCIONAL = 11,
+}
+
+export enum EPackageType {
+  TECNOLOGICO = 2,
+  PROFESIONAL = 3,
+  ESPECIALIZACION = 5,
+}
+
+export const PACKAGE_TYPE = {
+  INDIVIDUAL: {
+    6: '1', //TECNOLOGICO
+    7: '4', //PROFESIONAL
+    16: '5', //ESPECIALIZACION
+  },
+  COMPLETO: {
+    6: '2', //TECNOLOGICO
+    7: '3', //PROFESIONAL
+    16: '5', //ESPECIALIZACION
+  },
+};
+
+export enum EPackageCode {
+  INSCRIPCION = '6',
+}
+
+export enum EDiscountStatus {
+  PENDIENTE = 1,
+  APROBADO = 2,
+  RECHAZADO = 3,
+  FACTURADO = 4,
+  INACTIVO = 5,
 }

@@ -1,7 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { EConnection } from 'src/constants/database.constant';
-import { IPaymentSearch } from 'src/interfaces/payment.interface';
-import { In, Repository } from 'typeorm';
+import { IPaymentSearch } from '../../../interfaces/payment.interface';
+import { Repository } from 'typeorm';
 
 import { DetailPayment } from '../entities/detailPayment.entity';
 import { EStatusInvoice } from '../enums/invoice.enum';

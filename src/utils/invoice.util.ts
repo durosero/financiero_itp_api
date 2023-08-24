@@ -1,5 +1,8 @@
-import { IDescriptionSys, ITotales } from 'src/interfaces/payment.interface';
-import { DetailInvoice } from 'src/modules/invoice/entities/detailInvoice.entity';
+import { generate } from 'randomstring';
+import { DeepPartial } from 'typeorm';
+import { IStudent } from '../interfaces/enrollment.interface';
+import { IDescriptionSys, ITotales } from '../interfaces/payment.interface';
+import { DetailInvoice } from '../modules/invoice/entities/detailInvoice.entity';
 
 export const limpiarCampos = (cadena: string = '') => {
   cadena.toString().replace(/[`~!@#$%^&*¬()_|\-=?;:'",.<>\{\}\[\]\\\/]/gim, '');
@@ -18,8 +21,9 @@ export const calcularTotales = (detalle: DetailInvoice[]): ITotales => {
     .map(({ valorUnidad, cantidad, aumento, descuento }) => {
       const subtotal = valorUnidad * cantidad;
       //primero se aplica el aumento, para calcular el descuento sobre el resultado obtenido
-      const subtotalGeneral = subtotal + subtotal * aumento;
-      return subtotalGeneral - subtotalGeneral * descuento;
+      const subtotalDescuento = subtotal * descuento;
+      const subtotalAumento = subtotal * aumento;
+      return subtotal - subtotalDescuento + subtotalAumento;
     })
     .reduce((a, b) => a + b, 0);
 
@@ -36,12 +40,15 @@ export const calcularTotales = (detalle: DetailInvoice[]): ITotales => {
   };
 };
 
-export const calcularSubTotal = (detInvoice: DetailInvoice): number => {
+export const calcularSubTotal = (
+  detInvoice: DeepPartial<DetailInvoice>,
+): number => {
   const { valorUnidad, cantidad, aumento, descuento } = detInvoice;
   const subtotal = valorUnidad * cantidad;
-  //primero se aplica el aumento, para calcular el descuento sobre el resultado obtenido
-  const subtotalGeneral = subtotal + subtotal * aumento;
-  return subtotalGeneral - subtotalGeneral * descuento;
+  //primero se aplica el descueto
+  const subtotalDescuento = subtotal * descuento;
+  const subtotalAumento = subtotal * aumento;
+  return subtotal - subtotalDescuento + subtotalAumento;
 };
 
 export const llenarSubTotal = (
@@ -53,4 +60,33 @@ export const llenarSubTotal = (
       subtotal: calcularSubTotal(detail),
     };
   });
+};
+
+export const generateCodeInvoice = (info: IStudent): string => {
+  const cadena =
+    info.ape1_persona +
+    info.ape2_persona +
+    info.nom1_persona +
+    info.nom2_persona +
+    info.ide_persona;
+
+  const newString = cadena
+    .replace(/\s+/g, '')
+    .replace(/[`~!@#$%^&*¬()_|\-=?;:'",.<>\{\}\[\]\\\/]/gim, '');
+
+  return generate({
+    charset: cadena,
+    length: 10,
+  });
+};
+
+export const generateEndDatePayment = (): Date => {
+  const currentDate = new Date();
+  const dt = new Date();
+  const month = dt.getMonth() + 1;
+  const year = dt.getFullYear();
+  const day = dt.getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+  currentDate.setDate(daysInMonth);
+  return currentDate;
 };

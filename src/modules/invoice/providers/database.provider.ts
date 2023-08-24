@@ -1,15 +1,9 @@
-import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { resolve } from 'path';
-import { EConnection } from 'src/constants/database.constant';
 import { DataSource } from 'typeorm';
 
-export const databaseProviders= {
+export const databaseProviders = {
   provide: 'DATA_SOURCE',
   useFactory: async () => {
-    console.log(
-      resolve(__dirname, '../entities/SysApolo/**/*.entity{.ts,.js}'),
-    );
-
     const dataSource = new DataSource({
       // name: EConnection.SYSAPOLO,
       type: 'mssql',

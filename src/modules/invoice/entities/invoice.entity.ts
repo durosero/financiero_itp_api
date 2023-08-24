@@ -17,7 +17,7 @@ import { Person } from './person.entity';
 @Index('PRIMARY', ['id'], { unique: true })
 @Entity('fin_pago')
 export class Invoice {
-  @PrimaryColumn({ name: '_id' })
+  @PrimaryGeneratedColumn({ name: '_id' })
   id: number;
 
   @Column({ name: 'codigo' })
@@ -54,14 +54,14 @@ export class Invoice {
   @Column({ name: 'periodo_id', nullable: true })
   periodoId: number | null;
 
-  @Column({ name: 'cod_paquete', nullable: true })
-  codPaquete: number | null;
+  @Column({ name: 'cod_paquete', nullable: true, type: 'varchar' })
+  codPaquete: string | null;
 
   @Column({ name: 'is_online', nullable: true })
   isOnline: number | null;
 
   @Index('fk_cat_pago_1', ['categoriaPagoId'])
-  @Column({ name: 'categoria_pago_id', nullable: true })
+  @Column({ name: 'categoria_pago_id', nullable: true, type: 'integer' })
   categoriaPagoId: number | null;
 
   @Column({ name: 'json_detalle', nullable: true })
@@ -95,7 +95,9 @@ export class Invoice {
   })
   emailSend: EEmailStatus;
 
-  @OneToMany(() => DetailInvoice, (detailInvoice) => detailInvoice.invoice)
+  @OneToMany(() => DetailInvoice, (detailInvoice) => detailInvoice.invoice, {
+    cascade: true,
+  })
   detailInvoices: DetailInvoice[];
 
   @OneToMany(() => DetailPayment, (detailPayments) => detailPayments.invoice)

@@ -3,20 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { isEmpty } from 'lodash';
 import Mail from 'nodemailer/lib/mailer';
 import { resolve } from 'path';
-import * as puppeteer from 'puppeteer';
-import { messageEmailPaymentOk } from 'src/utils/messages.util';
-import {
-  compileHBS,
-  convertHTMLtoPDF,
-  initializeHelpersHbs,
-} from 'src/utils/reportPdf.util';
 import { DataSource, DeepPartial, In } from 'typeorm';
 import { IInfoInvoice } from '../../interfaces/enrollment.interface';
 import {
   IPaymentReceipt,
   IPaymentRegister,
-  IPaymentSearch,
+  IPaymentSearch
 } from '../../interfaces/payment.interface';
+import { messageEmailPaymentOk } from '../../utils/messages.util';
+import {
+  compileHBS,
+  convertHTMLtoPDF,
+  initializeHelpersHbs
+} from '../../utils/reportPdf.util';
 
 import { calcularTotales, llenarSubTotal } from '../../utils/invoice.util';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
@@ -26,11 +25,11 @@ import {
   EFormPayment,
   ESeverityCode,
   EStatusInvoice,
-  ESysApoloStatus,
+  ESysApoloStatus
 } from './enums/invoice.enum';
-import { InvoiceSysService } from './invoiceSys.service';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
 import { InvoiceRepository } from './repositories/invoice.repository';
+import { InvoiceSysService } from './services/invoiceSys.service';
 @Injectable()
 export class InvoiceService {
   constructor(

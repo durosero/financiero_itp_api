@@ -1,4 +1,4 @@
-export interface IEnrollment {
+export interface IEnrollment extends IStudent {
   cod_matricula: number;
   cod_doc: number | null;
   tipo_doc: string | null;
@@ -25,7 +25,7 @@ export interface IStudent {
   cod_doc: number; // 1,
   tipo_doc: string; // "CC",
   nom_estadomatricula: string | null; // "ADMITIDO",
-  ide_persona: number; // "1124863016",
+  ide_persona: string; // "1124863016",
   ape1_persona: string; // "LOZADA",
   ape2_persona: string; // "ALVAREZ",
   nom1_persona: string; // "JORGE",
