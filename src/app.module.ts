@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -9,6 +10,7 @@ import config from './config/config';
 import { getEnvirontment } from './config/environments';
 import { EConnection } from './constants/database.constant';
 import { InvoiceModule } from './modules/invoice/invoice.module';
+import { TasksService } from './services/tasks.service';
 
 @Module({
   imports: [
@@ -68,10 +70,12 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
       logging: 'all',
     }),
 
+    ScheduleModule.forRoot(),
+
     InvoiceModule,
   ],
   controllers: [AppController],
   exports: [],
-  providers: [AppService],
+  providers: [AppService,TasksService],
 })
 export class AppModule {}
