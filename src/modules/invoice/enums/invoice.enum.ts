@@ -48,6 +48,7 @@ export enum ECategoryInvoice {
   CERTIFICADOS_CONSTANCIAS = 9,
   HOMOLOGACIONES = 10,
   CARNET_INSTITUCIONAL = 11,
+  ESPECIALIZACIONES = 12,
 }
 
 export enum EPackageType {

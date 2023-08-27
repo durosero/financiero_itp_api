@@ -7,17 +7,17 @@ import { UnprocessableEntity } from '../../../classes/httpError/unProcessableEnt
 import {
   IEnrollment,
   IInfoInvoice,
-  IStudent
+  IStudent,
 } from '../../../interfaces/enrollment.interface';
 import { createDetailInvoice } from '../../../utils/adapters/invoiceAdapter.util';
 import {
   calcularTotales,
   generateCodeInvoice,
-  generateEndDatePayment
+  generateEndDatePayment,
 } from '../../../utils/invoice.util';
 import {
   INFO_MATRICULA_SQL,
-  INFO_PROGRAMA_SQL
+  INFO_PROGRAMA_SQL,
 } from '../constant/invoiceSql.constant';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
 import { Invoice } from '../entities/invoice.entity';
@@ -29,7 +29,7 @@ import {
   EPackageCode,
   EStatusInvoice,
   ESysApoloStatus,
-  PACKAGE_TYPE
+  PACKAGE_TYPE,
 } from '../enums/invoice.enum';
 import { ConfigRepository } from '../repositories/config.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
@@ -55,7 +55,7 @@ export class ConsultInvoiceService {
   ) {}
 
   async searchInvoiceForPayment(invoiceId: number): Promise<Invoice> {
-    const invoice = await this.invoiceRepository.findFullById(invoiceId);
+    const invoice = await this.invoiceRepository.findById(invoiceId);
     if (!invoice) throw new NotFoundError('Factura no encontrada');
 
     const {
@@ -66,7 +66,11 @@ export class ConsultInvoiceService {
       jsonResponse,
     } = invoice;
 
-    if (!isEmpty(detailPayments))
+    const payments = detailPayments.filter(
+      (payment) => payment.estadoPagoId == EStatusInvoice.PAGO_FINALIZADO_OK,
+    );
+
+    if (!isEmpty(payments))
       throw new UnprocessableEntity('Factura ya ha sido pagada');
 
     const { info_cliente: infoStudet }: IInfoInvoice = JSON.parse(jsonResponse);
@@ -81,10 +85,41 @@ export class ConsultInvoiceService {
       return await this.generateInvoiceRegistration(matriculaId);
     }
 
-    return await this.generateInvoiceOtherByStudent(infoStudet, codPaquete);
+    if (categoriaPagoId == ECategoryInvoice.OTROS) {
+      return await this.generateInvoiceOtherInvoice(invoice);
+    }
+
+    return await this.generateInvoiceVariousByInvoice(infoStudet, codPaquete);
   }
 
-  async generateInvoiceOtherByStudent(
+  async generateInvoiceOtherInvoice(invoice: Invoice): Promise<Invoice> {
+    const { jsonResponse, codPaquete, detailInvoices, categoriaPagoId } =
+      invoice;
+
+    const { info_cliente: infoMatricula }: IInfoInvoice =
+      JSON.parse(jsonResponse);
+
+    const { totalExtraordinario: total } = calcularTotales(detailInvoices);
+    return this.invoiceRepository.create({
+      ...invoice,
+      estadoId: EStatusInvoice.PAGO_INICADO,
+      estudianteId: infoMatricula.ide_persona,
+      codigo: generateCodeInvoice(infoMatricula),
+      matriculaId: null,
+      valor: total,
+      periodoId: infoMatricula.cod_periodo,
+      codPaquete: codPaquete,
+      isOnline: EOnlinePayment.NO,
+      categoriaPagoId,
+      fechaUpdate: new Date(),
+      fechaLimite: generateEndDatePayment(),
+      sysapoloVerify: ESysApoloStatus.PENDIENTE,
+      emailSend: EEmailStatus.PENDIENTE,
+      detailInvoices: detailInvoices,
+    });
+  }
+
+  async generateInvoiceVariousByInvoice(
     infoMatricula: IStudent,
     packageCode: string,
   ): Promise<Invoice> {
@@ -121,7 +156,7 @@ export class ConsultInvoiceService {
       matriculaId: null,
       valor: total,
       periodoId: infoMatricula.cod_periodo,
-      codPaquete: EPackageCode.INSCRIPCION,
+      codPaquete: packageCode,
       isOnline: EOnlinePayment.NO,
       categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),
@@ -177,7 +212,7 @@ export class ConsultInvoiceService {
       matriculaId: null,
       valor: total,
       periodoId: infoMatricula.cod_periodo,
-      codPaquete: EPackageCode.INSCRIPCION,
+      codPaquete: packageCode,
       isOnline: EOnlinePayment.NO,
       categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),
@@ -301,7 +336,7 @@ export class ConsultInvoiceService {
 
     if (!period) throw new NotFoundError('No se encontro el periodo academico');
 
-    const { fecIniMatextraord, fecFinMatextraord, fecFinMatOrdinaria } = period;
+    const { fecFinMatextraord, fecFinMatOrdinaria } = period;
     const currenDate = new Date();
 
     let aumentoExtra: number = discounts
@@ -313,8 +348,8 @@ export class ConsultInvoiceService {
       .reduce((a, b) => a + b.porcentaje, 0);
 
     if (
-      currenDate.getTime() >= fecIniMatextraord.getTime() &&
-      !isNull(fecIniMatextraord)
+      currenDate.getTime() >= fecFinMatextraord.getTime() &&
+      !isNull(fecFinMatextraord)
     ) {
       aumentoExtra = aumentoExtra + config.porcentajeExt;
     }

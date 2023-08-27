@@ -23,7 +23,7 @@ export class PackageRepository extends Repository<Package> {
       .select('pk')
       .innerJoinAndSelect('pk.packageDetail', 'pkd')
       .innerJoinAndSelect('pk.config', 'pkc')
-      .where('pk.code = :packageCode', { packageCode })
+      .where('pk.codigo = :packageCode', { packageCode })
       .getOne();
   }
 }

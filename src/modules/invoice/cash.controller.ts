@@ -43,7 +43,7 @@ export class CashController {
         valor_factura: invoice.valor,
         descripcion_estado: EResponseDescription.OK,
         codigo_estado: EResposeStatusCode.OK,
-        fecha_limite_pago: moment(invoice.fechaLimite).format('DD/MM/AAAA'),
+        fecha_limite_pago: moment(invoice.fechaLimite).format('DD/MM/YYYY'),
       };
       return response;
     } catch (error) {
@@ -51,7 +51,7 @@ export class CashController {
         valor_factura: 0,
         descripcion_estado: EResponseDescription.WARNING,
         codigo_estado: EResposeStatusCode.WARNING,
-        fecha_limite_pago: moment(new Date()).format('DD/MM/AAAA'),
+        fecha_limite_pago: moment(new Date()).format('DD/MM/YYYY'),
         descripcion_general: error?.message ?? null,
       };
     }
