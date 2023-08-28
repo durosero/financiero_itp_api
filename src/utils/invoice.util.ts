@@ -1,3 +1,4 @@
+import * as QRCode from 'qrcode';
 import { generate } from 'randomstring';
 import { DeepPartial } from 'typeorm';
 import { IStudent } from '../interfaces/enrollment.interface';
@@ -89,4 +90,19 @@ export const generateEndDatePayment = (): Date => {
   const daysInMonth = new Date(year, month, 0).getDate();
   currentDate.setDate(daysInMonth);
   return currentDate;
+};
+
+export const createQRBase64 = async (
+  dataForQRcode: string,
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    QRCode.toDataURL(
+      dataForQRcode,
+      { errorCorrectionLevel: 'L', type: 'image/webp' },
+      (err: any, src: string) => {
+        if (err) reject(err);
+        resolve(src);
+      },
+    );
+  });
 };

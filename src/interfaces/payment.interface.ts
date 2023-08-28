@@ -41,5 +41,5 @@ export interface IPaymentReceipt {
   detailInvoice: DetailInvoice[];
   category: CategoryInvoice;
   totalInt?: number;
-  totalStr?: string;
+  qrBase64?: string;
 }
