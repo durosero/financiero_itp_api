@@ -42,4 +42,5 @@ export interface IPaymentReceipt {
   category: CategoryInvoice;
   totalInt?: number;
   qrBase64?: string;
+  url?: string;
 }

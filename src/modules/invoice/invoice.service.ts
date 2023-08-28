@@ -8,19 +8,19 @@ import { IInfoInvoice } from '../../interfaces/enrollment.interface';
 import {
   IPaymentReceipt,
   IPaymentRegister,
-  IPaymentSearch,
+  IPaymentSearch
 } from '../../interfaces/payment.interface';
 import { messageEmailPaymentOk } from '../../utils/messages.util';
 import {
   compileHBS,
   convertHTMLtoPDF,
-  initializeHelpersHbs,
+  initializeHelpersHbs
 } from '../../utils/reportPdf.util';
 
 import {
   calcularTotales,
   createQRBase64,
-  llenarSubTotal,
+  llenarSubTotal
 } from '../../utils/invoice.util';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { DetailPayment } from './entities/detailPayment.entity';
@@ -29,12 +29,11 @@ import {
   EFormPayment,
   ESeverityCode,
   EStatusInvoice,
-  ESysApoloStatus,
+  ESysApoloStatus
 } from './enums/invoice.enum';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { InvoiceSysService } from './services/invoiceSys.service';
-import * as QRCode from 'qrcode';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -244,7 +243,7 @@ export class InvoiceService {
     const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
     const { totalExtraordinario: total } = calcularTotales(detailInvoices);
 
-    const url = `${process.env.BASE_URL}/invoice/payment/html/${invoice.id}}`;
+    const url = `${process.env.BASE_URL}/invoice/payment/pdf/${invoice.id}`;
     const qrBase64 = await createQRBase64(url);
 
     const dataReport: IPaymentReceipt = {
@@ -255,6 +254,7 @@ export class InvoiceService {
       invoice,
       totalInt: total,
       qrBase64,
+      url,
     };
     const pathTemplateBody = resolve(
       __dirname,
