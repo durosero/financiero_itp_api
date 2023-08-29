@@ -3,7 +3,6 @@ FROM node:18.12.1 AS deps
 
 RUN mkdir -p /app
 WORKDIR /app
-
 # Configure timezone
 ENV TZ=America/Bogota
 ENV NODE_ENV=dev
@@ -16,10 +15,10 @@ RUN apt-get update && apt-get install curl gnupg -y \
   && apt-get install google-chrome-stable -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
-ENV CHROME_BIN="/usr/bin/chromium-browser"
+# ENV CHROME_BIN="/usr/bin/chromium-browser"
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-COPY package.json tsconfig.json tsconfig.build.json .env /app/
+COPY package.json tsconfig.json tsconfig.build.json /app/
 RUN npm install
 
 
@@ -28,7 +27,6 @@ RUN npm install
 FROM node:18.12.1 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps .env .
 COPY . .
 RUN npm run build
 RUN npm run copy:templates
@@ -45,6 +43,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
-
+COPY .env .env
 
 CMD [ "node","dist/main" ]
+
