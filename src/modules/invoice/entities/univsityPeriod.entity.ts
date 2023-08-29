@@ -1,10 +1,11 @@
+import { ColumnDateTransformer } from 'src/classes/columnDateTransformer';
 import {
   Column,
   Entity,
   Index,
   PrimaryGeneratedColumn
 } from 'typeorm';
-import { ColumnDateTransformer } from '../../../classes/ColumnDateTransformer';
+
 
 @Index('PRIMARY', ['id'], { unique: true })
 @Entity('col_colegio_periodo')
