@@ -1,0 +1,13 @@
+version: '3.1'
+services:
+  rest-financiero:
+    platform: linux/amd64
+    build: .
+    image: sigedin/financiero
+    container_name: rest-financiero
+    restart: unless-stopped
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      PORT: ${PORT}
+      NODE_ENV: ${NODE_ENV}

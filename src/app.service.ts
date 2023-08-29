@@ -7,7 +7,7 @@ export class AppService {
       message: 'Hola mundo',
       developer: 'Duvan Rosero',
       error: false,
-      env: process.env.APP_ENV,
+      env: process.env.NODE_ENV,
       base_url: process.env.BASE_URL,
     };
   }
