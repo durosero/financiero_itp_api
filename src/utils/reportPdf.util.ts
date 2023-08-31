@@ -3,7 +3,6 @@ import handlebars, { HelperOptions } from 'handlebars';
 import * as puppeteer from 'puppeteer';
 import * as moment from 'moment';
 import * as currency from 'currency-formatter';
-var locateChrome = require('locate-chrome');
 
 const defaultConfigPDF: puppeteer.PDFOptions = {
   format: 'a4',
@@ -20,12 +19,9 @@ export const convertHTMLtoPDF = async (
   html: string,
   configPDF: puppeteer.PDFOptions = defaultConfigPDF,
 ) => {
-  const executablePath: string =
-    (await new Promise((resolve) =>
-      locateChrome((arg: any) => resolve(arg)),
-    )) || '';
   const browser = await puppeteer.launch({
-    executablePath,
+    executablePath: process.env.CHROME_BIN,
+    headless: false,
     args: [
       '--no-sandbox',
       '--headless',
