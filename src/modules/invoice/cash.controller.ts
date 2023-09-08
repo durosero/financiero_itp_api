@@ -5,7 +5,7 @@ import {
   HttpCode,
   Post,
   Query,
-  Res
+  Res,
 } from '@nestjs/common';
 import axios from 'axios';
 import * as moment from 'moment';
@@ -13,16 +13,19 @@ import { NotFoundError } from '../../classes/httpError/notFounError';
 import { IPaymentRegister } from '../../interfaces/payment.interface';
 import {
   EResponseDescription,
-  EResposeStatusCode, IReponsePayment, IResponseInvoice
+  EResposeStatusCode,
+  IReponsePayment,
+  IResponseInvoice,
 } from '../../interfaces/responseInvoice.interface';
 import { MESSAGE_RESPONSE } from './constant/invoice.constant';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { ValidateInvoiceDto } from './dto/validate-invoice.dto';
 import { ESeverity } from './enums/invoice.enum';
-import { InvoiceService } from './invoice.service';
+import { InvoiceService } from './services/invoice.service';
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
+import { getStatusInvoicePaymentWs } from 'src/utils/webService.util';
 @Controller('caja')
 export class CashController {
   constructor(
@@ -65,7 +68,7 @@ export class CashController {
     );
     if (!invoice) throw new NotFoundError('Factura no encontrada');
 
-    const responsePayment = await this.getStatusInvoicePayment(payload);
+    const responsePayment = await getStatusInvoicePaymentWs(payload.referencia_pago);
     if (!responsePayment)
       throw new NotFoundError('No se encontraron pagos en el banco');
 
@@ -74,7 +77,7 @@ export class CashController {
       invoice,
     );
 
-    this.invoiceSysService.registerInvoiceSysApolo(invoice);
+    this.invoiceSysService.registerInvoiceSysApolo(invoice.id);
 
     return res.send();
   }
@@ -93,44 +96,5 @@ export class CashController {
     return response;
   }
 
-  async getStatusInvoicePayment({
-    referencia_pago,
-  }: ValidateInvoiceDto): Promise<IPaymentRegister | null> {
-    try {
-      // const resp  = await  axios.get<IReponsePayment>('https://api-colombia.com/api/v1/Department');
-      const { data, status } = await axios.get(
-        'https://api-colombia.com/api/v1/Department',
-        {
-          headers: {
-            Accept: 'application/json',
-          },
-          params: {
-            referencia_pago,
-          },
-        },
-      );
-
-      const paymentResponse: IReponsePayment = {
-        referencia_pago: referencia_pago,
-        estado_pago: 1,
-        valor_pagado: 13470,
-        codigo_transaccion: '1970816193',
-        fecha: '15/03/2023 09:47:25',
-      };
-
-      const parseResponse: IPaymentRegister = {
-        invoiceId: Number(paymentResponse.referencia_pago),
-        value: paymentResponse.valor_pagado,
-        transactionCode: paymentResponse.codigo_transaccion,
-        status: paymentResponse.estado_pago,
-        date: moment(paymentResponse.fecha, 'DD/MM/YYYY HH:mm:ss').toDate(),
-        bankId: 3, // TODO: implemten bank id
-      };
-
-      return parseResponse;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+ 
 }

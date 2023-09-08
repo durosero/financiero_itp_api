@@ -10,8 +10,8 @@ export enum ESysApoloStatus {
 }
 
 export enum EOnlinePayment {
-  SI = 1,
-  NO = 0,
+  SI = '1',
+  NO = '0',
 }
 
 export enum EEmailStatus {

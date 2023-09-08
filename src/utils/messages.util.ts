@@ -11,6 +11,6 @@ export const messageEmailPaymentOk = (
     Reciba un cordial saludo.
         
     En el archivo adjunto encontrará los detalles de: ${category}. Para abrir el archivo PDF, por favor utilice como clave los dígitos del número de identificación del cliente. En caso de tener problemas con la descarga o visualizacion del archivo puede usar el siguiente enlace:
-    ${process.env.BASE_URL}/invoice/payment/pdf/${invoiceId} 
+    ${process.env.BASE_URL}/v2/invoice/payment/pdf/${invoiceId} 
         `;
 };

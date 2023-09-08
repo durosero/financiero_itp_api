@@ -8,7 +8,11 @@ import {
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { EEmailStatus, ESysApoloStatus } from '../enums/invoice.enum';
+import {
+  EEmailStatus,
+  EOnlinePayment,
+  ESysApoloStatus,
+} from '../enums/invoice.enum';
 import { CategoryInvoice } from './categoryInvoice.entity';
 import { DetailInvoice } from './detailInvoice.entity';
 import { DetailPayment } from './detailPayment.entity';
@@ -57,8 +61,13 @@ export class Invoice {
   @Column({ name: 'cod_paquete', nullable: true, type: 'varchar' })
   codPaquete: string | null;
 
-  @Column({ name: 'is_online', nullable: true })
-  isOnline: number | null;
+  @Column({
+    name: 'is_online',
+    nullable: true,
+    type: 'enum',
+    enum: EOnlinePayment,
+  })
+  isOnline: EOnlinePayment | null;
 
   @Index('fk_cat_pago_1', ['categoriaPagoId'])
   @Column({ name: 'categoria_pago_id', nullable: true, type: 'integer' })

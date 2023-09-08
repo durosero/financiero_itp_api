@@ -51,11 +51,12 @@ export class InvoiceSysService {
   ) {}
 
   // Main register Invoice
-  async registerInvoiceSysApolo(invoice: Invoice): Promise<boolean> {
+  async registerInvoiceSysApolo(invoiceIdParam: number): Promise<boolean> {
     const dataSource = await databaseProviders.useFactory();
     const queryRunner = dataSource.createQueryRunner();
 
-    //TODO: si la factura ya esta en sysApolo se debe borrar y crear nuevamente
+    const invoice = await this.invoiceRepository.findById(invoiceIdParam);
+    if (!invoice) throw new NotFoundError('Factura no encontrada');
 
     const { person, id: invoiceId } = invoice;
     let codTer: string = '00000';
@@ -189,14 +190,14 @@ export class InvoiceSysService {
     const insertInvoice = dbSys.manager.create(InvoiceSys, invoiceSys);
 
     await dbSys.manager.insert(InvoiceSys, insertInvoice);
-
+    let idDet = codDetInvoiceQuery[0].cod_det_factura ?? 0;
     const inserDetailInvoice = detailInvoices.map<
       DeepPartial<DetailInvoiceSys>
     >((detail) => {
       const { cantidad, conceptoId, valorUnidad } = detail;
-      let idDet = codDetInvoiceQuery[0].cod_det_factura ?? 0;
+      idDet++;
       return {
-        id: idDet + 1,
+        id: idDet,
         facturaId: codInvoiceQuery[0].cod_factura ?? null,
         conceptoId,
         cantidad,

@@ -1,10 +1,11 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { Invoice } from '../entities/invoice.entity';
 import {
   EEmailStatus,
+  EOnlinePayment,
   EStatusInvoice,
-  ESysApoloStatus
+  ESysApoloStatus,
 } from '../enums/invoice.enum';
 
 export class InvoiceRepository extends Repository<Invoice> {
@@ -65,12 +66,12 @@ export class InvoiceRepository extends Repository<Invoice> {
       .getOne();
   }
 
-  async updateStatusVerifySys(status: ESysApoloStatus, invoiceId: number) {
+  updateStatusVerifySys(status: ESysApoloStatus, invoiceId: number) {
     const invoice: DeepPartial<Invoice> = {
       sysapoloVerify: status,
       fechaUpdate: new Date(),
     };
-    await this.repository
+    return this.repository
       .createQueryBuilder()
       .update(Invoice)
       .set(invoice)
@@ -78,16 +79,82 @@ export class InvoiceRepository extends Repository<Invoice> {
       .execute();
   }
 
-  async updateStatusEmailSend(status: EEmailStatus, invoiceId: number) {
+  updateStatusEmailSend(status: EEmailStatus, invoiceId: number) {
     const invoice: DeepPartial<Invoice> = {
       emailSend: status,
       fechaUpdate: new Date(),
     };
-    await this.repository
+    return this.repository
       .createQueryBuilder()
       .update(Invoice)
       .set(invoice)
       .where({ id: invoiceId })
       .execute();
+  }
+
+  deleteInvoices() {
+    return (
+      this.repository
+        .createQueryBuilder('inv')
+        .select(['inv.id', 'inv.fechaUpdate'])
+        .leftJoin('inv.detailPayments', 'dtPay')
+        .where('dtPay.id IS NULL')
+        .andWhere('DATEDIFF(NOW(),inv.fecha_update) >=3')
+        // .limit(5)
+        .getMany()
+        .then((invoices) => {
+          return this.repository.remove(invoices);
+        })
+    );
+  }
+
+  getPaidInvoiceLimit(limit: number = 10) {
+    return this.repository
+      .createQueryBuilder('inv')
+      .select(['inv.id'])
+      .innerJoinAndSelect('inv.detailPayments', 'dtPay')
+      .innerJoinAndSelect('dtPay.statusPayment', 'stp')
+      .where('dtPay.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
+      })
+      .andWhere('inv.sysapoloVerify = :statusSys', {
+        statusSys: ESysApoloStatus.PENDIENTE,
+      })
+      .andWhere('YEAR(dtPay.fecha)=YEAR(NOW())')
+      .limit(limit)
+      .getMany();
+  }
+
+  async findInvoicesCash(limit: number = 300) {
+    const payments = await this.repository
+      .createQueryBuilder('inv')
+      .innerJoinAndSelect('inv.detailPayments', 'dtPay')
+      .where('dtPay.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
+      })
+      .andWhere('DATEDIFF(NOW(),dtPay.fecha) <=3')
+      .groupBy('inv.id')
+      .getMany();
+
+    const ids = payments.flatMap(({ detailPayments }) => {
+      return detailPayments.map(({ facturaId }) => facturaId);
+    });
+
+    return this.repository
+      .createQueryBuilder('inv')
+      .select(['inv.id', 'inv.fecha'])
+      .innerJoinAndSelect('inv.person', 'per')
+      .innerJoinAndSelect('per.documentType', 'dt')
+      .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
+      .leftJoinAndSelect('inv.detailPayments', 'dtPay')
+      .innerJoinAndSelect('dtIv.concept', 'cnp')
+      .where('inv.isOnline = :online', {
+        online: EOnlinePayment.NO,
+      })
+      .andWhere('DATEDIFF(NOW(),inv.fecha) <=3')
+      .andWhere({ id: In(ids) })
+      .orderBy('inv.fecha', 'DESC')
+      .limit(limit)
+      .getMany();
   }
 }

@@ -26,7 +26,7 @@ import { PaymentPointSys } from './entities/SysApolo/paymentPointSys.entity';
 import { ThirdPartySys } from './entities/SysApolo/thirdPartySys.entity';
 import { UniversityPeriod } from './entities/univsityPeriod.entity';
 import { InvoiceController } from './invoice.controller';
-import { InvoiceService } from './invoice.service';
+import { InvoiceService } from './services/invoice.service';
 import { ValidateTokenMiddleware } from './middlewares/validateToken.middleware';
 import { ConfigRepository } from './repositories/config.repository';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
@@ -35,6 +35,8 @@ import { InvoiceRepository } from './repositories/invoice.repository';
 import { PackageRepository } from './repositories/package.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
+import { TasksService } from 'src/services/tasks.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   controllers: [InvoiceController, CashController],
@@ -48,7 +50,9 @@ import { InvoiceSysService } from './services/invoiceSys.service';
     ConfigRepository,
     DiscountRepository,
   ],
+  exports: [InvoiceRepository, InvoiceSysService,InvoiceService],
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
       Invoice,
       DetailInvoice,
