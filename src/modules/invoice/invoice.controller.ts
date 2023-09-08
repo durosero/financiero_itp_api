@@ -6,7 +6,6 @@ import {
   ParseIntPipe,
   StreamableFile,
 } from '@nestjs/common';
-import { SchedulerRegistry } from '@nestjs/schedule';
 
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
@@ -35,15 +34,5 @@ export class InvoiceController {
   @Get('register/sysapolo/:id')
   async registerInvoiceSysApolo(@Param('id', ParseIntPipe) invoiceId: number) {
     return this.sysApoloService.registerInvoiceSysApolo(invoiceId);
-  }
-
-  // @Get('payment/email/:id')
-  // async getEmail(@Param('id') invoiceId: number) {
-  //   return this.invoiceService.equide(invoiceId);
-  // }
-
-  @Get('delete')
-  async getInvoiceDeletes() {
-    return this.invoiceService.getInvocesDelete();
   }
 }

@@ -7,27 +7,25 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import axios from 'axios';
 import * as moment from 'moment';
+import { IPaymentSearch } from 'src/interfaces/payment.interface';
+import { getStatusInvoicePaymentWs } from 'src/utils/webService.util';
 import { NotFoundError } from '../../classes/httpError/notFounError';
-import { IPaymentRegister } from '../../interfaces/payment.interface';
 import {
   EResponseDescription,
   EResposeStatusCode,
-  IReponsePayment,
   IResponseInvoice,
 } from '../../interfaces/responseInvoice.interface';
-import { MESSAGE_RESPONSE } from './constant/invoice.constant';
+import { MESSAGE_RESPONSE_REVERSE } from './constant/invoice.constant';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { ValidateInvoiceDto } from './dto/validate-invoice.dto';
 import { ESeverity } from './enums/invoice.enum';
-import { InvoiceService } from './services/invoice.service';
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
+import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
-import { getStatusInvoicePaymentWs } from 'src/utils/webService.util';
 @Controller('caja')
-export class CashController {
+export class PopularCashController {
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly invoiceSysService: InvoiceSysService,
@@ -68,7 +66,9 @@ export class CashController {
     );
     if (!invoice) throw new NotFoundError('Factura no encontrada');
 
-    const responsePayment = await getStatusInvoicePaymentWs(payload.referencia_pago);
+    const responsePayment = await getStatusInvoicePaymentWs(
+      payload.referencia_pago,
+    );
     if (!responsePayment)
       throw new NotFoundError('No se encontraron pagos en el banco');
 
@@ -90,11 +90,9 @@ export class CashController {
     const response = {
       codigo_estado: status,
       severidad: Object.values(ESeverity)[status],
-      descripcion: MESSAGE_RESPONSE[status],
+      descripcion: MESSAGE_RESPONSE_REVERSE[status],
     };
 
     return response;
   }
-
- 
 }

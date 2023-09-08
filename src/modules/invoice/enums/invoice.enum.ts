@@ -25,6 +25,12 @@ export enum ESeverity {
   ERROR = 'E',
 }
 
+export enum ERegisterDescription {
+  INFORMATIVE = 'Se realizó exitosamente la actualización del pago.',
+  WARNING = 'No se pudo realizar la actualización del pago.',
+  ERROR = 'Ocurrió un error inesperado en la operación.',
+}
+
 export enum ESeverityCode {
   INFORMATIVE = 0,
   WARNING = 1,

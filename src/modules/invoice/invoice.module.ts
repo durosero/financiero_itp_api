@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { EConnection } from '../../constants/database.constant';
 import { AUTH_EMAIL } from '../../constants/email.constant';
-import { CashController } from './cash.controller';
+import { PopularCashController } from './popularCash.controller';
 import { BankAccount } from './entities/bankAccount.entity';
 import { CategoryInvoice } from './entities/categoryInvoice.entity';
 import { Concept } from './entities/concept.entity';
@@ -37,9 +37,11 @@ import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
 import { TasksService } from 'src/services/tasks.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BbvaCashController } from './bbvaCash.controller';
+import { BbvaAuthMiddleware } from './middlewares/bbvaAuth.middleware';
 
 @Module({
-  controllers: [InvoiceController, CashController],
+  controllers: [InvoiceController, PopularCashController, BbvaCashController],
   providers: [
     InvoiceService,
     InvoiceSysService,
@@ -50,7 +52,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigRepository,
     DiscountRepository,
   ],
-  exports: [InvoiceRepository, InvoiceSysService,InvoiceService],
+  exports: [InvoiceRepository, InvoiceSysService, InvoiceService],
   imports: [
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
@@ -105,6 +107,14 @@ export class InvoiceModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(ValidateTokenMiddleware).forRoutes({
       path: 'caja/reverso',
+      method: RequestMethod.POST,
+    });
+    consumer.apply(BbvaAuthMiddleware).forRoutes({
+      path: 'caja/bbva/consultarfactura',
+      method: RequestMethod.POST,
+    });
+    consumer.apply(BbvaAuthMiddleware).forRoutes({
+      path: 'caja/bbva/reversarpagos',
       method: RequestMethod.POST,
     });
   }
