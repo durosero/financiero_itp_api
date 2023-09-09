@@ -3,8 +3,14 @@ import { ValidateInvoiceDto } from 'src/modules/invoice/dto/validate-invoice.dto
 import axios from 'axios';
 import * as moment from 'moment';
 import { IReponsePayment } from 'src/interfaces/responseInvoice.interface';
+import {
+  EBankCash,
+  EBankCodeCash,
+} from 'src/modules/invoice/enums/invoice.enum';
 
-export const getStatusInvoicePaymentWs = async (referencia_pago: string): Promise<IPaymentRegister | null> => {
+export const getStatusInvoicePaymentWs = async (
+  referencia_pago: string,
+): Promise<IPaymentRegister | null> => {
   try {
     // const resp  = await  axios.get<IReponsePayment>('https://api-colombia.com/api/v1/Department');
     const { data, status } = await axios.get(
@@ -33,7 +39,8 @@ export const getStatusInvoicePaymentWs = async (referencia_pago: string): Promis
       transactionCode: paymentResponse.codigo_transaccion,
       status: paymentResponse.estado_pago,
       date: moment(paymentResponse.fecha, 'DD/MM/YYYY HH:mm:ss').toDate(),
-      bankId: 3, // TODO: implemten bank id
+      bankId: EBankCodeCash.POPULAR,
+      name_bank: EBankCash.POPULAR,
     };
 
     return parseResponse;

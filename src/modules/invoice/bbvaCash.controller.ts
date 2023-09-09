@@ -1,25 +1,19 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Logger,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Logger, Post } from '@nestjs/common';
 import * as moment from 'moment';
 import {
   EResponseDescription,
   EResposeStatusCode,
-  IResponseInvoice,
 } from 'src/interfaces/responseInvoice.interface';
+import { NotFoundError } from '../../classes/httpError/notFounError';
+import { IPaymentRegister } from '../../interfaces/payment.interface';
 import { MESSAGE_RESPONSE_REVERSE } from './constant/invoice.constant';
 import { BbvaConsultInvoiceDto } from './dto/bbva-consult-invoice';
 import { BbvaRegisterPaymentDto } from './dto/bbva-register-payment';
 import { BbvaReversePaymentDto } from './dto/bbva-reverse-payment';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
-import { ValidateInvoiceDto } from './dto/validate-invoice.dto';
 import {
+  EBankCash,
+  EBankCodeCash,
   ERegisterDescription,
   ESeverity,
   ESeverityCode,
@@ -28,8 +22,6 @@ import {
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceService } from './services/invoice.service';
-import { NotFoundError } from '../../classes/httpError/notFounError';
-import { IPaymentRegister } from '../../interfaces/payment.interface';
 
 @Controller('caja/bbva')
 export class BbvaCashController {
@@ -112,6 +104,8 @@ export class BbvaCashController {
         transactionCode: payload.Id_transaccion,
         value: payload.Valor_pagado,
         bankId: payload.Id_Banco,
+        // bankId: EBankCodeCash.BBVA,
+        name_bank: EBankCash.BBVA,
       };
 
       const success = await this.invoiceService.registerPaymentCash(

@@ -35,6 +35,7 @@ import {
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceSysService } from './invoiceSys.service';
+import * as moment from 'moment';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -52,7 +53,7 @@ export class InvoiceService {
       searchData,
     );
 
-    if (!isEmpty(payments)) return true;
+    if (!isEmpty(payments)) return false;
     const registered = await this.registerPaymentInvoiceSigedin(payload);
 
     if (registered) {
@@ -152,6 +153,16 @@ export class InvoiceService {
     if (isEmpty(payments)) return ESeverityCode.WARNING;
     const ids = payments.map((row) => row.id);
 
+    const isValid = payments.some((payment) => {
+      const now = moment(payload.fecha_reverso); //todays date
+      const end = moment(payment.fecha);
+      const duration = moment.duration(now.diff(end));
+      console.log(duration.asHours());
+      return duration.asHours() < 12;
+    });
+
+    if (!isValid) return ESeverityCode.WARNING;
+
     const deleted = await this.deletePaymentInvoiceSigedin(payload, ids);
     if (deleted) {
       this.invoiceSysService.deleteInvoiceSysApolo(payload.referencia_pago);
@@ -233,7 +244,7 @@ export class InvoiceService {
     };
     const pathTemplateBody = resolve(
       __dirname,
-      '../../',
+      '../../../',
       'templates/reciboPago.pdf.hbs',
     );
 
@@ -248,8 +259,7 @@ export class InvoiceService {
     return buffer;
   }
 
-  async getInvocesDelete(){
+  async getInvocesDelete() {
     return this.invoiceRepository.findInvoicesCash();
   }
-
 }

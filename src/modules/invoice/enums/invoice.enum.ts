@@ -87,3 +87,17 @@ export enum EDiscountStatus {
   FACTURADO = 4,
   INACTIVO = 5,
 }
+
+export enum EBankCash {
+  BBVA = 'BANCO BBVA COLOMBIA S.A.',
+  BANCOLOMBIA = 'BANCOLOMBIA',
+  POPULAR = 'BANCO POPULAR',
+  DAVIPLATA = 'DAVIPLATA',
+  NEQUI = 'NEQUI',
+  AGRARIO = 'BANCO AGRARIO',
+}
+export enum EBankCodeCash {
+  BBVA = 13,
+  BANCOLOMBIA = 2,
+  POPULAR = 3,
+}

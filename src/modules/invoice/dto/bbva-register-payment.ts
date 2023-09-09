@@ -70,4 +70,6 @@ export class BbvaRegisterPaymentDto {
   @MaxLength(200)
   @IsOptional()
   Info_adicional?: string | null;
+
+  Nombre_banco?: string;
 }

@@ -19,6 +19,7 @@ export interface IPaymentRegister {
   status: EStatusInvoice;
   date: Date;
   bankId?: number;
+  name_bank?: string;
 }
 
 export interface IDescriptionSys {
