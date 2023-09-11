@@ -259,7 +259,7 @@ export class InvoiceService {
     return buffer;
   }
 
-  async getInvocesDelete() {
-    return this.invoiceRepository.findInvoicesCash();
+  async getInfoInvoice(invoiceId: number) {
+    return this.invoiceRepository.findById(invoiceId);
   }
 }

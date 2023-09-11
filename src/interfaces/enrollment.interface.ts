@@ -40,6 +40,7 @@ export interface IStudent {
   cod_nivel_educativo: number; // 30,
   cod_nivel_edu: number; // 6,
   nro_creditos: number | null; // 6,
+
   ide_genero: string; // "M",
   cod_municipio: string; // "86001",
   dir_persona: string; // "C6"

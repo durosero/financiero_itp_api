@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty, isNull } from 'lodash';
+import { IGenerateInvoice } from 'src/interfaces/invoice.interface';
 import { DataSource, Repository } from 'typeorm';
 import { NotFoundError } from '../../../classes/httpError/notFounError';
 import { UnprocessableEntity } from '../../../classes/httpError/unProcessableEntity';
 import {
   IEnrollment,
-  IInfoInvoice,
-  IStudent,
+  IInfoInvoice
 } from '../../../interfaces/enrollment.interface';
 import { createDetailInvoice } from '../../../utils/adapters/invoiceAdapter.util';
 import {
   calcularTotales,
   generateCodeInvoice,
-  generateEndDatePayment,
+  generateEndDatePayment
 } from '../../../utils/invoice.util';
 import {
-  INFO_MATRICULA_SQL,
-  INFO_PROGRAMA_SQL,
+  INFO_MATRICULA_SQL
 } from '../constant/invoiceSql.constant';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
 import { Invoice } from '../entities/invoice.entity';
@@ -29,7 +28,7 @@ import {
   EPackageCode,
   EStatusInvoice,
   ESysApoloStatus,
-  PACKAGE_TYPE,
+  PACKAGE_TYPE
 } from '../enums/invoice.enum';
 import { ConfigRepository } from '../repositories/config.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
@@ -57,14 +56,7 @@ export class ConsultInvoiceService {
   async searchInvoiceForPayment(invoiceId: number): Promise<Invoice> {
     const invoice = await this.invoiceRepository.findById(invoiceId);
     if (!invoice) throw new NotFoundError('Factura no encontrada');
-
-    const {
-      detailPayments,
-      codPaquete,
-      matriculaId,
-      categoriaPagoId,
-      jsonResponse,
-    } = invoice;
+    const { detailPayments } = invoice;
 
     const payments = detailPayments.filter(
       (payment) => payment.estadoPagoId == EStatusInvoice.PAGO_FINALIZADO_OK,
@@ -73,61 +65,96 @@ export class ConsultInvoiceService {
     if (!isEmpty(payments))
       throw new UnprocessableEntity('Factura ya ha sido pagada');
 
+    const { codPaquete, matriculaId, categoriaPagoId, jsonResponse, isOnline } =
+      invoice;
+
     const { info_cliente: infoStudet }: IInfoInvoice = JSON.parse(jsonResponse);
+    const { totalExtraordinario: total } = calcularTotales(
+      invoice.detailInvoices,
+    );
+
+    const params: IGenerateInvoice = {
+      infoEstudiante: infoStudet,
+      codPaquete,
+      matriculaId,
+      isPagoOnline: Boolean(isOnline),
+      total,
+      categoriaPagoId,
+    };
 
     //TODO: update items factura   //verifica si ya existe una factura creada con esa matricula y con ese paquete
 
+    return this.generateInvoiceByParams(params);
+  }
+
+  generateInvoiceByParams(params: IGenerateInvoice): Promise<Invoice> {
+    const { categoriaPagoId } = params;
+
     if (categoriaPagoId == ECategoryInvoice.MATRICULA) {
-      return await this.generateInvoiceEnrrolment(matriculaId);
+      return this.generateInvoiceEnrrolment(params);
     }
 
     if (categoriaPagoId == ECategoryInvoice.INSCRIPCION) {
-      return await this.generateInvoiceRegistration(matriculaId);
+      return this.generateInvoiceRegistration(params);
     }
 
     if (categoriaPagoId == ECategoryInvoice.OTROS) {
-      return await this.generateInvoiceOtherInvoice(invoice);
+      return this.generateInvoiceOther(params);
     }
 
-    return await this.generateInvoiceVariousByInvoice(infoStudet, codPaquete);
+    return this.generateInvoiceVariousByInvoice(params);
   }
 
-  async generateInvoiceOtherInvoice(invoice: Invoice): Promise<Invoice> {
-    const { jsonResponse, codPaquete, detailInvoices, categoriaPagoId } =
-      invoice;
+  async generateInvoiceOther(params: IGenerateInvoice): Promise<Invoice> {
+    const config = await this.configRepository.getCurrentConfig();
+    if (!config) throw new NotFoundError('No se encontro la configuracion');
 
-    const { info_cliente: infoMatricula }: IInfoInvoice =
-      JSON.parse(jsonResponse);
+    const packageInvoce = await this.packageRepository.findConceptsByCode(
+      params.codPaquete,
+    );
+    if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
 
-    const { totalExtraordinario: total } = calcularTotales(detailInvoices);
+    const { packageDetail, categoriaId } = packageInvoce;
+
+    const { infoEstudiante: infoMatricula } = params;
+
+    const detailInvoice = this.detailInvoiceRepository.create(
+      createDetailInvoice(packageDetail),
+    );
+
+    const infoClient: IInfoInvoice = {
+      info_cliente: params.infoEstudiante,
+    };
+
     return this.invoiceRepository.create({
-      ...invoice,
       estadoId: EStatusInvoice.PAGO_INICADO,
       estudianteId: infoMatricula.ide_persona,
+      jsonResponse: JSON.stringify(infoClient),
       codigo: generateCodeInvoice(infoMatricula),
-      matriculaId: null,
-      valor: total,
+      matriculaId: params.matriculaId,
+      valor: params.total,
       periodoId: infoMatricula.cod_periodo,
-      codPaquete: codPaquete,
+      codPaquete: params.codPaquete,
       isOnline: EOnlinePayment.NO,
-      categoriaPagoId,
+      categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),
       fechaLimite: generateEndDatePayment(),
       sysapoloVerify: ESysApoloStatus.PENDIENTE,
       emailSend: EEmailStatus.PENDIENTE,
-      detailInvoices: detailInvoices,
+      detailInvoices: detailInvoice,
     });
   }
 
   async generateInvoiceVariousByInvoice(
-    infoMatricula: IStudent,
-    packageCode: string,
+    params: IGenerateInvoice,
   ): Promise<Invoice> {
     const config = await this.configRepository.getCurrentConfig();
     if (!config) throw new NotFoundError('No se encontro la configuracion');
 
+    const { codPaquete, infoEstudiante, matriculaId } = params;
+
     const packageInvoce = await this.packageRepository.findConceptsByCode(
-      packageCode,
+      codPaquete,
     );
     if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
 
@@ -135,8 +162,11 @@ export class ConsultInvoiceService {
 
     const discounts = await this.discountRepository.findForInvoiceGeneral(
       categoriaId,
-      infoMatricula.ide_persona,
+      infoEstudiante.ide_persona,
     );
+    const infoClient: IInfoInvoice = {
+      info_cliente: params.infoEstudiante,
+    };
 
     let aumentoExtra: number = discounts
       .filter((discount) => discount.accion == '0')
@@ -151,12 +181,13 @@ export class ConsultInvoiceService {
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
-      estudianteId: infoMatricula.ide_persona,
-      codigo: generateCodeInvoice(infoMatricula),
-      matriculaId: null,
+      estudianteId: infoEstudiante.ide_persona,
+      codigo: generateCodeInvoice(infoEstudiante),
+      matriculaId: matriculaId,
+      jsonResponse: JSON.stringify(infoClient),
       valor: total,
-      periodoId: infoMatricula.cod_periodo,
-      codPaquete: packageCode,
+      periodoId: infoEstudiante.cod_periodo,
+      codPaquete: codPaquete,
       isOnline: EOnlinePayment.NO,
       categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),
@@ -167,68 +198,14 @@ export class ConsultInvoiceService {
     });
   }
 
-  async generateInvoiceOther(
-    estudianteId: string,
-    packageCode: string,
-    idProgramaPersona: number,
+  async generateInvoiceRegistration(
+    params: IGenerateInvoice,
   ): Promise<Invoice> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    const [infoMatricula] = await queryRunner.manager.query<IEnrollment[]>(
-      INFO_PROGRAMA_SQL,
-      [estudianteId, idProgramaPersona],
-    );
-    if (!infoMatricula) throw new NotFoundError('No se encontro el programa');
-
-    const config = await this.configRepository.getCurrentConfig();
-    if (!config) throw new NotFoundError('No se encontro la configuracion');
-
-    const packageInvoce = await this.packageRepository.findConceptsByCode(
-      packageCode,
-    );
-    if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
-
-    const { packageDetail, categoriaId } = packageInvoce;
-
-    const discounts = await this.discountRepository.findForInvoiceGeneral(
-      categoriaId,
-      infoMatricula.ide_persona,
-    );
-
-    let aumentoExtra: number = discounts
-      .filter((discount) => discount.accion == '0')
-      .reduce((a, b) => a + b.porcentaje, 0);
-
-    let descuentoExtra: number = discounts
-      .filter((discount) => discount.accion == '1')
-      .reduce((a, b) => a + b.porcentaje, 0);
-    const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(packageDetail, aumentoExtra, descuentoExtra),
-    );
-    const { totalExtraordinario: total } = calcularTotales(detailInvoice);
-    return this.invoiceRepository.create({
-      estadoId: EStatusInvoice.PAGO_INICADO,
-      estudianteId: infoMatricula.ide_persona,
-      codigo: generateCodeInvoice(infoMatricula),
-      matriculaId: null,
-      valor: total,
-      periodoId: infoMatricula.cod_periodo,
-      codPaquete: packageCode,
-      isOnline: EOnlinePayment.NO,
-      categoriaPagoId: categoriaId,
-      fechaUpdate: new Date(),
-      sysapoloVerify: ESysApoloStatus.PENDIENTE,
-      fechaLimite: generateEndDatePayment(),
-      emailSend: EEmailStatus.PENDIENTE,
-      detailInvoices: detailInvoice,
-    });
-  }
-
-  async generateInvoiceRegistration(matriculaId: number): Promise<Invoice> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     const [infoMatricula] = await queryRunner.manager.query<IEnrollment[]>(
       INFO_MATRICULA_SQL,
-      [matriculaId],
+      [params.matriculaId],
     );
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 
@@ -270,13 +247,19 @@ export class ConsultInvoiceService {
     const detailInvoice = this.detailInvoiceRepository.create(
       createDetailInvoice(packageDetail, aumentoExtra, descuentoExtra),
     );
+
+    const infoClient: IInfoInvoice = {
+      info_cliente: params.infoEstudiante,
+    };
+
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
       estudianteId: infoMatricula.ide_persona,
       codigo: generateCodeInvoice(infoMatricula),
-      matriculaId: matriculaId,
+      matriculaId: params.matriculaId,
       valor: total,
+      jsonResponse: JSON.stringify(infoClient),
       periodoId: infoMatricula.cod_periodo,
       codPaquete: EPackageCode.INSCRIPCION,
       isOnline: EOnlinePayment.NO,
@@ -289,12 +272,12 @@ export class ConsultInvoiceService {
     });
   }
 
-  async generateInvoiceEnrrolment(matriculaId: number): Promise<Invoice> {
+  async generateInvoiceEnrrolment(params: IGenerateInvoice): Promise<Invoice> {
     const queryRunner = this.dataSource.createQueryRunner();
 
     const [infoMatricula] = await queryRunner.manager.query<IEnrollment[]>(
       INFO_MATRICULA_SQL,
-      [matriculaId],
+      [params.matriculaId],
     );
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 
@@ -362,14 +345,19 @@ export class ConsultInvoiceService {
         quantity,
       ),
     );
+    const infoClient: IInfoInvoice = {
+      info_cliente: params.infoEstudiante,
+    };
+
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
       estudianteId: infoMatricula.ide_persona,
       codigo: generateCodeInvoice(infoMatricula),
-      matriculaId: matriculaId,
+      matriculaId: params.matriculaId,
       valor: total,
       periodoId: infoMatricula.cod_periodo,
+      jsonResponse: JSON.stringify(infoClient),
       codPaquete,
       fechaLimite: fecFinMatextraord ?? fecFinMatOrdinaria,
       isOnline: EOnlinePayment.NO,

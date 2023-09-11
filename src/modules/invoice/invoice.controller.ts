@@ -1,11 +1,16 @@
 import {
+  Body,
   Controller,
   Get,
   Header,
   Param,
   ParseIntPipe,
-  StreamableFile,
+  Post,
+  StreamableFile
 } from '@nestjs/common';
+import { generarCodigoBarras } from 'src/utils/barcode.util';
+import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
+import { GenerateInvoiceService } from './services/generateInvoice.service';
 
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
@@ -15,6 +20,7 @@ export class InvoiceController {
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly sysApoloService: InvoiceSysService,
+    private readonly generateInvoiceService: GenerateInvoiceService,
   ) {}
 
   @Get('payment/pdf/:id')
@@ -34,5 +40,34 @@ export class InvoiceController {
   @Get('register/sysapolo/:id')
   async registerInvoiceSysApolo(@Param('id', ParseIntPipe) invoiceId: number) {
     return this.sysApoloService.registerInvoiceSysApolo(invoiceId);
+  }
+
+  @Get('info/:id')
+  async getInfoInvoice(@Param('id', ParseIntPipe) invoiceId: number) {
+    const invoiceDB = await this.invoiceService.getInfoInvoice(invoiceId);
+
+    return invoiceDB;
+  }
+
+  @Post('generate')
+  async generateInvoice(@Body() payload: GenerateInvoiceDto) {
+    const { jsonResponse, ...rest } =
+      await this.generateInvoiceService.mainGenerateInvoice(payload);
+    return {
+      ...rest,
+      jsonResponse: JSON.parse(jsonResponse),
+    };
+  }
+
+  @Get('generateBarcode')
+  @Header('content-type', 'image/svg+xml')
+  async generateBarcode() {
+    const data = generarCodigoBarras({
+      limitDate: new Date(),
+      reference: '1231213',
+      value: 20000,
+    });
+
+    return data.barcodeSvg;
   }
 }

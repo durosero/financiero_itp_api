@@ -28,11 +28,13 @@ export class InvoiceRepository extends Repository<Invoice> {
         'inv.categoriaPagoId',
         'inv.matriculaId',
         'inv.codPaquete',
+        'inv.valor',
       ])
       .innerJoinAndSelect('inv.person', 'per')
       .innerJoinAndSelect('per.documentType', 'dt')
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
       .leftJoinAndSelect('inv.detailPayments', 'dtPay')
+      .innerJoinAndSelect('dtPay.statusPayment', 'stp')
       .innerJoinAndSelect('dtIv.concept', 'cnp')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .where('inv.id = :invoiceId', { invoiceId })

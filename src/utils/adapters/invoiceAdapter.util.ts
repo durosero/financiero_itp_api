@@ -5,8 +5,8 @@ import { calcularSubTotal } from '../invoice.util';
 
 export const createDetailInvoice = (
   packageDetail: PackageDetail[],
-  aumentoExtra: number,
-  descuentoExtra: number,
+  aumentoExtra: number=0,
+  descuentoExtra: number=0,
   quantity: number = 1,
 ) => {
   return packageDetail
@@ -16,6 +16,7 @@ export const createDetailInvoice = (
       return {
         conceptoId,
         valorUnidad,
+        concept: detail.concept,
         aumento: detail.descuentoExt == '1' ? aumentoExtra + aumento : aumento,
         cantidad: cantidad < 1 ? quantity : cantidad,
         descuento:

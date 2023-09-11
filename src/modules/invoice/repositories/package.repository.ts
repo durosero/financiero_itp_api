@@ -22,6 +22,7 @@ export class PackageRepository extends Repository<Package> {
     return this.createQueryBuilder('pk')
       .select('pk')
       .innerJoinAndSelect('pk.packageDetail', 'pkd')
+      .innerJoinAndSelect('pkd.concept', 'con')
       .innerJoinAndSelect('pk.config', 'pkc')
       .where('pk.codigo = :packageCode', { packageCode })
       .getOne();

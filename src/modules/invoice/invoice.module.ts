@@ -1,10 +1,11 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { EConnection } from '../../constants/database.constant';
 import { AUTH_EMAIL } from '../../constants/email.constant';
-import { PopularCashController } from './popularCash.controller';
+import { BbvaCashController } from './bbvaCash.controller';
 import { BankAccount } from './entities/bankAccount.entity';
 import { CategoryInvoice } from './entities/categoryInvoice.entity';
 import { Concept } from './entities/concept.entity';
@@ -26,19 +27,18 @@ import { PaymentPointSys } from './entities/SysApolo/paymentPointSys.entity';
 import { ThirdPartySys } from './entities/SysApolo/thirdPartySys.entity';
 import { UniversityPeriod } from './entities/univsityPeriod.entity';
 import { InvoiceController } from './invoice.controller';
-import { InvoiceService } from './services/invoice.service';
+import { BbvaAuthMiddleware } from './middlewares/bbvaAuth.middleware';
 import { ValidateTokenMiddleware } from './middlewares/validateToken.middleware';
+import { PopularCashController } from './popularCash.controller';
 import { ConfigRepository } from './repositories/config.repository';
 import { DetailPaymentRepository } from './repositories/detailPayment.repository';
 import { DiscountRepository } from './repositories/discount.repository';
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { PackageRepository } from './repositories/package.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
+import { GenerateInvoiceService } from './services/generateInvoice.service';
+import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
-import { TasksService } from 'src/services/tasks.service';
-import { ScheduleModule } from '@nestjs/schedule';
-import { BbvaCashController } from './bbvaCash.controller';
-import { BbvaAuthMiddleware } from './middlewares/bbvaAuth.middleware';
 
 @Module({
   controllers: [InvoiceController, PopularCashController, BbvaCashController],
@@ -46,6 +46,7 @@ import { BbvaAuthMiddleware } from './middlewares/bbvaAuth.middleware';
     InvoiceService,
     InvoiceSysService,
     ConsultInvoiceService,
+    GenerateInvoiceService,
     DetailPaymentRepository,
     InvoiceRepository,
     PackageRepository,
