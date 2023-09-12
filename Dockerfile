@@ -10,7 +10,7 @@ RUN npm install
 # Build the app with cache dependencies
 FROM node:18.12.1-slim AS builder
 WORKDIR /app
-COPY --from=deps --chmod=765 /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 RUN npm run copy:templates

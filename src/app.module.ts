@@ -57,15 +57,14 @@ import { TasksService } from './services/tasks.service';
     TypeOrmModule.forRoot({
       name: EConnection.SYSAPOLO,
       type: 'mssql',
-      
       host: process.env.MSSQL_SYSAPOLO_SERVER,
       username: process.env.MSSQL_SYSAPOLO_USER,
       password: process.env.MSSQL_SYSAPOLO_PASS,
       database: process.env.MSSQL_SYSAPOLO_DATABASE,
       entities: [],
       autoLoadEntities: true,
-
       options: {
+        encrypt: false,
         trustServerCertificate: true,
       },
       synchronize: false,
@@ -78,6 +77,6 @@ import { TasksService } from './services/tasks.service';
   ],
   controllers: [AppController],
   exports: [],
-  providers: [AppService,TasksService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}
