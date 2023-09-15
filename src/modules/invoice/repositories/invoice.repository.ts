@@ -159,4 +159,29 @@ export class InvoiceRepository extends Repository<Invoice> {
       .limit(limit)
       .getMany();
   }
+
+  async findDuplicateInvoice(
+    clientId: string,
+    categoryId: number,
+  ): Promise<Invoice> {
+    const result = await this.repository
+      .createQueryBuilder('inv')
+      .select('inv')
+      .leftJoinAndSelect('inv.detailPayments', 'dtPay')
+      .where('inv.estudianteId = :clientId', {
+        clientId,
+      })
+      .andWhere('inv.categoriaPagoId = :categoryId', { categoryId })
+      .andWhere('DATEDIFF(NOW(),inv.fecha) <=30')
+      .orderBy('inv.fecha', 'DESC')
+      .getMany();
+
+    for (const invoice of result) {
+      const paid = invoice.detailPayments.some(
+        (payment) => payment.estadoPagoId == EStatusInvoice.PAGO_FINALIZADO_OK,
+      );
+      if (!paid) return invoice;
+    }
+    return undefined;
+  }
 }

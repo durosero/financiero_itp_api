@@ -52,7 +52,7 @@ export class InvoiceController {
   @Post('generate')
   async generateInvoice(@Body() payload: GenerateInvoiceDto) {
     const { jsonResponse, ...rest } =
-      await this.generateInvoiceService.mainGenerateInvoice(payload);
+      await this.generateInvoiceService.generateAndSaveInvoice(payload);
     return {
       ...rest,
       jsonResponse: JSON.parse(jsonResponse),

@@ -30,7 +30,7 @@ export class Invoice {
   @Column({ unique: true, name: 'codigo_barras', nullable: true })
   codigoBarras: string | null;
 
-  @Column({ name: 'descripcion', nullable: true })
+  @Column({ name: 'descripcion', nullable: true, default: null, type: 'text' })
   descripcion: string | null;
 
   @Column({ name: 'json_response', nullable: true })
