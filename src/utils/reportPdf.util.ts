@@ -59,7 +59,11 @@ export const initializeHelpersHbs = () => {
   handlebars.registerHelper('ifCond', ifCond);
 
   handlebars.registerHelper('formatDate', function (datetime) {
-    return moment(datetime).format('DD-MM-YYYY HH:mm:ss A');
+    return moment(datetime).format('DD-MM-YYYY hh:mm:ss A');
+  });
+
+  handlebars.registerHelper('formatDateSimple', function (datetime) {
+    return moment(datetime).format('DD-MM-YYYY');
   });
 
   handlebars.registerHelper('formatDateFull', function (datetime) {
@@ -68,6 +72,10 @@ export const initializeHelpersHbs = () => {
 
   handlebars.registerHelper('empty', function (value) {
     return !value ? 'NO APLICA' : value;
+  });
+
+  handlebars.registerHelper('percent', function (value) {
+    return value* 100;
   });
 
   handlebars.registerHelper('formatCurrency', function (value) {
