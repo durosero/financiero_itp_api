@@ -18,6 +18,7 @@ export class DiscountRepository extends Repository<Discounts> {
   ) {
     return this.repository
       .createQueryBuilder('dto')
+      .innerJoinAndSelect('dto.discountCategory', 'disc')
       .where('dto.categoriaPagoId = :categoriaId', { categoriaId })
       .andWhere('dto.estudianteId = :estudianteId', {
         estudianteId,

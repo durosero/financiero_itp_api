@@ -17,6 +17,8 @@ import {
   initializeHelpersHbs,
 } from '../../../utils/reportPdf.util';
 
+import * as moment from 'moment';
+import { NotFoundError } from 'src/classes/httpError/notFounError';
 import {
   calcularTotales,
   createQRBase64,
@@ -35,7 +37,6 @@ import {
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceSysService } from './invoiceSys.service';
-import * as moment from 'moment';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -260,6 +261,9 @@ export class InvoiceService {
   }
 
   async getInfoInvoice(invoiceId: number) {
-    return this.invoiceRepository.findById(invoiceId);
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+    if (!invoice)
+      throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+    return invoice;
   }
 }

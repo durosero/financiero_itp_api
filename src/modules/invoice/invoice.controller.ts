@@ -8,7 +8,6 @@ import {
   Post,
   StreamableFile
 } from '@nestjs/common';
-import { generarCodigoBarras } from 'src/utils/barcode.util';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { GenerateInvoiceService } from './services/generateInvoice.service';
 
@@ -45,7 +44,6 @@ export class InvoiceController {
   @Get('info/:id')
   async getInfoInvoice(@Param('id', ParseIntPipe) invoiceId: number) {
     const invoiceDB = await this.invoiceService.getInfoInvoice(invoiceId);
-
     return invoiceDB;
   }
 
@@ -59,15 +57,17 @@ export class InvoiceController {
     };
   }
 
-  @Get('generateBarcode')
-  @Header('content-type', 'image/svg+xml')
-  async generateBarcode() {
-    const data = generarCodigoBarras({
-      limitDate: new Date(),
-      reference: '1231213',
-      value: 20000,
-    });
+  @Get('generate/pdf/:id')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'inline; filename=file.pdf')
+  async generateInvoicePdf(@Param('id', ParseIntPipe) invoiceId: number) {
+    const buffer = await this.generateInvoiceService.getPdfInvoice(invoiceId);
+    return new StreamableFile(buffer);
+  }
 
-    return data.barcodeSvg;
+  @Get('generate/html/:id')
+  @Header('content-type', 'text/html')
+  async generateInvoiceHtml(@Param('id', ParseIntPipe) invoiceId: number) {
+    return this.generateInvoiceService.getHtmlInvoice(invoiceId);
   }
 }

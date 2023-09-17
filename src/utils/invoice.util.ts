@@ -4,6 +4,7 @@ import { DeepPartial } from 'typeorm';
 import { IStudent } from '../interfaces/enrollment.interface';
 import { IDescriptionSys, ITotales } from '../interfaces/payment.interface';
 import { DetailInvoice } from '../modules/invoice/entities/detailInvoice.entity';
+import { Package } from '../modules/invoice/entities/package.entity';
 
 export const limpiarCampos = (cadena: string = '') => {
   cadena.toString().replace(/[`~!@#$%^&*¬()_|\-=?;:'",.<>\{\}\[\]\\\/]/gim, '');
@@ -17,8 +18,21 @@ export const generateDescriptionSys = (payload: IDescriptionSys): string => {
 };
 
 //esto solo puede funcionar si el aumento solo corresponde a la matricula extraordinaria
-export const calcularTotales = (detalle: DetailInvoice[]): ITotales => {
+export const calcularTotales = (
+  detalle: DetailInvoice[],
+  porcentajeExt: number = 0.1,
+): ITotales => {
   const totalExtraordinario = detalle
+    .map(({ valorUnidad, cantidad, aumento, descuento }) => {
+      const subtotal = valorUnidad * cantidad;
+      //primero se aplica el aumento, para calcular el descuento sobre el resultado obtenido
+      const subtotalDescuento = subtotal * descuento;
+      const subtotalAumento = subtotal * aumento;
+      return subtotal - subtotalDescuento + subtotalAumento;
+    })
+    .reduce((a, b) => a + b, 0);
+
+  const totalCompleto = detalle
     .map(({ valorUnidad, cantidad, aumento, descuento }) => {
       const subtotal = valorUnidad * cantidad;
       //primero se aplica el aumento, para calcular el descuento sobre el resultado obtenido
@@ -38,6 +52,7 @@ export const calcularTotales = (detalle: DetailInvoice[]): ITotales => {
   return {
     totalExtraordinario,
     totalOrdinario,
+    totalCompleto,
   };
 };
 
@@ -61,6 +76,35 @@ export const llenarSubTotal = (
       subtotal: calcularSubTotal(detail),
     };
   });
+};
+
+export const calcularTotalExtraOrdinario = (
+  detInvoice: DetailInvoice[],
+  paquete: Package,
+): number => {
+  const { packageDetail, config } = paquete;
+
+  const concepts = packageDetail.map((det) => {
+    if (det.descuentoExt == '1') {
+      return det.conceptoId;
+    }
+  });
+
+  const totalExtraordinario = detInvoice
+    .map(({ valorUnidad, cantidad, aumento, descuento, conceptoId }) => {
+      if (concepts.some((item) => conceptoId == item)) {
+        aumento = config.porcentajeExt;
+      }
+
+      const subtotal = valorUnidad * cantidad;
+      //primero se aplica el aumento, para calcular el descuento sobre el resultado obtenido
+      const subtotalDescuento = subtotal * descuento;
+      const subtotalAumento = subtotal * aumento;
+      return subtotal - subtotalDescuento + subtotalAumento;
+    })
+    .reduce((a, b) => a + b, 0);
+
+  return totalExtraordinario;
 };
 
 export const generateCodeInvoice = (info: IStudent): string => {

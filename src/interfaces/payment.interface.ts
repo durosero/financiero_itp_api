@@ -33,6 +33,7 @@ export interface IDescriptionSys {
 export interface ITotales {
   totalExtraordinario: number;
   totalOrdinario: number;
+  totalCompleto?: number;
 }
 
 export interface IPaymentReceipt {
