@@ -37,6 +37,7 @@ import {
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceSysService } from './invoiceSys.service';
+import { getBaseUrl } from 'src/config/environments';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -230,7 +231,7 @@ export class InvoiceService {
     const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
     const { totalExtraordinario: total } = calcularTotales(detailInvoices);
 
-    const url = `${process.env.BASE_URL}/v2/invoice/payment/pdf/${invoice.id}`;
+    const url = `${getBaseUrl()}/invoice/payment/pdf/${invoice.id}`;
     const qrBase64 = await createQRBase64(url);
 
     const dataReport: IPaymentReceipt = {

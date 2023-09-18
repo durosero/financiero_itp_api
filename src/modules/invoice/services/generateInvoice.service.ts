@@ -4,6 +4,7 @@ import { isNull, isEmpty } from 'lodash';
 import { resolve } from 'path';
 import { NotFoundError } from 'src/classes/httpError/notFounError';
 import { UnprocessableEntity } from 'src/classes/httpError/unProcessableEntity';
+import { getBaseUrl } from 'src/config/environments';
 import { IEnrollment, IInfoInvoice } from 'src/interfaces/enrollment.interface';
 import {
   IGenerateInvoice,
@@ -161,7 +162,7 @@ export class GenerateInvoiceService {
 
     invoice.detailInvoices = llenarSubTotal(detailInvoices);
 
-    const url = `${process.env.BASE_URL}/v2/invoice/generate/pdf/${invoice.id}`;
+    const url = `${getBaseUrl()}/invoice/generate/pdf/${invoice.id}`;
     const qrBase64 = await createQRBase64(url);
 
     initializeHelpersHbs();
