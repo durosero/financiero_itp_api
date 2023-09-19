@@ -1,3 +1,5 @@
+import { BASE_URL, PREFIX } from 'src/main';
+
 export const environments: {
   [key: string]: string;
 } = {
@@ -5,11 +7,6 @@ export const environments: {
   ['stag']: '.staging.env',
   ['pro']: '.production.env',
 };
-
-const portDefault: number = 3001;
-export const PORT = process.env.PORT ?? portDefault;
-export const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
-export const PREFIX = process.env.GLOBAL_PEFIX ?? '/api/v2';
 
 export function getEnvirontment() {
   const env = process.env.NODE_ENV ?? 'dev';

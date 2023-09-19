@@ -1,7 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { PORT, PREFIX } from './config/environments';
+
+export const PORT = process.env.PORT;
+export const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
+export const PREFIX = process.env.GLOBAL_PEFIX ?? '/api/v2';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
