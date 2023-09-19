@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import { PORT, PREFIX } from './config/environments';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.setGlobalPrefix(PREFIX);
 
   app.useGlobalPipes(
