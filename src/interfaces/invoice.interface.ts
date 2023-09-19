@@ -10,6 +10,7 @@ export interface IGenerateInvoice {
   total: number;
   isPagoOnline: boolean;
   infoEstudiante: IStudent;
+  cantidad?: number;
 }
 
 export interface IInvicePdfParams {
@@ -23,4 +24,11 @@ export interface IInvicePdfParams {
   qrBase64?: string;
   generated?: Date;
   limitDate?: Date;
+}
+
+export interface IInvoiceResponse {
+  redirectPayment: string | null;
+  error: boolean;
+  message: string;
+  invoiceId?: number;
 }

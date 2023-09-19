@@ -17,6 +17,7 @@ export interface IEnrollment extends IStudent {
   nom_nivel_educativo: string;
   cod_nivel_educativo: number;
   cod_nivel_edu: number;
+  id_programa_persona?: number;
   nro_creditos: number;
 }
 

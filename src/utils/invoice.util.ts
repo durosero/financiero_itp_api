@@ -1,5 +1,6 @@
 import * as QRCode from 'qrcode';
 import { generate } from 'randomstring';
+import { EOnlinePayment } from 'src/modules/invoice/enums/invoice.enum';
 import { DeepPartial } from 'typeorm';
 import { IStudent } from '../interfaces/enrollment.interface';
 import { IDescriptionSys, ITotales } from '../interfaces/payment.interface';
@@ -149,4 +150,8 @@ export const createQRBase64 = async (
       },
     );
   });
+};
+
+export const isOnlinePay = (online: string) => {
+  return online == EOnlinePayment.SI;
 };

@@ -65,6 +65,7 @@ export class GenerateInvoiceService {
       total,
       personaId,
       programaPersonaId,
+      cantidad,
     } = payload;
 
     const packageInvoce = await this.packageRepository.findConceptsByCode(
@@ -93,6 +94,7 @@ export class GenerateInvoiceService {
       isPagoOnline,
       total,
       categoriaPagoId: packageInvoce.categoriaId,
+      cantidad,
     };
 
     const invoice = this.consultInvoiceService.generateInvoiceByParams(params);

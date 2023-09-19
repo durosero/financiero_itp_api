@@ -7,17 +7,16 @@ import { NotFoundError } from '../../../classes/httpError/notFounError';
 import { UnprocessableEntity } from '../../../classes/httpError/unProcessableEntity';
 import {
   IEnrollment,
-  IInfoInvoice
+  IInfoInvoice,
 } from '../../../interfaces/enrollment.interface';
 import { createDetailInvoice } from '../../../utils/adapters/invoiceAdapter.util';
 import {
   calcularTotales,
   generateCodeInvoice,
-  generateEndDatePayment
+  generateEndDatePayment,
+  isOnlinePay,
 } from '../../../utils/invoice.util';
-import {
-  INFO_MATRICULA_SQL
-} from '../constant/invoiceSql.constant';
+import { INFO_MATRICULA_SQL } from '../constant/invoiceSql.constant';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
 import { Invoice } from '../entities/invoice.entity';
 import { UniversityPeriod } from '../entities/univsityPeriod.entity';
@@ -28,7 +27,7 @@ import {
   EPackageCode,
   EStatusInvoice,
   ESysApoloStatus,
-  PACKAGE_TYPE
+  PACKAGE_TYPE,
 } from '../enums/invoice.enum';
 import { ConfigRepository } from '../repositories/config.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
@@ -77,7 +76,7 @@ export class ConsultInvoiceService {
       infoEstudiante: infoStudet,
       codPaquete,
       matriculaId,
-      isPagoOnline: Boolean(isOnline),
+      isPagoOnline: isOnlinePay(isOnline),
       total,
       categoriaPagoId,
     };
@@ -151,7 +150,7 @@ export class ConsultInvoiceService {
     const config = await this.configRepository.getCurrentConfig();
     if (!config) throw new NotFoundError('No se encontro la configuracion');
 
-    const { codPaquete, infoEstudiante, matriculaId } = params;
+    const { codPaquete, infoEstudiante, matriculaId, cantidad } = params;
 
     const packageInvoce = await this.packageRepository.findConceptsByCode(
       codPaquete,
@@ -176,7 +175,12 @@ export class ConsultInvoiceService {
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
     const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(packageDetail, aumentoExtra, descuentoExtra),
+      createDetailInvoice(
+        packageDetail,
+        aumentoExtra,
+        descuentoExtra,
+        cantidad,
+      ),
     );
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({

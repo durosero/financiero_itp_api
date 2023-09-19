@@ -54,4 +54,12 @@ export class GenerateInvoiceDto {
     return Number(value);
   })
   programaPersonaId: number;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  @Transform(({ value }) => {
+    return Number(value);
+  })
+  cantidad?: number;
 }
