@@ -47,6 +47,8 @@ COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY .env .env
+COPY .staging.env .staging.env
+COPY .protuction.env .protuction.env
 
 CMD [ "node","dist/main" ]
 
