@@ -9,13 +9,13 @@ import { IInfoInvoice } from '../../../interfaces/enrollment.interface';
 import { IDescriptionSys } from '../../../interfaces/payment.interface';
 import {
   calcularSubTotal,
-  generateDescriptionSys
+  generateDescriptionSys,
 } from '../../../utils/invoice.util';
 import { getVerificationGigit } from '../../../utils/nitConverter.util';
 import {
   COD_DET_FACTURA_SQL,
   COD_FACTURA_SQL,
-  COD_TERCERO_SQL
+  COD_TERCERO_SQL,
 } from '../constant/invoiceSql.constant';
 
 import { Invoice } from '../entities/invoice.entity';
@@ -40,12 +40,17 @@ export class InvoiceSysService {
     private readonly invoiceRepository: InvoiceRepository,
     private readonly detailPaymentRepository: DetailPaymentRepository,
   ) {
-    databaseProviders.useFactory().then((dataSource) => {
-      this.invoiceSysRepository = dataSource.getRepository(InvoiceSys);
-      this.detailInvoiceSysRepository = dataSource.getRepository(DetailInvoiceSys);
-      this.thirdPartySysRepository = dataSource.getRepository(ThirdPartySys);
-      this.paymentPointSysRepository = dataSource.getRepository(PaymentPointSys);
-    });
+    databaseProviders.useFactory().then(
+      (dataSource) => {
+        this.invoiceSysRepository = dataSource.getRepository(InvoiceSys);
+        this.detailInvoiceSysRepository =
+          dataSource.getRepository(DetailInvoiceSys);
+        this.thirdPartySysRepository = dataSource.getRepository(ThirdPartySys);
+        this.paymentPointSysRepository =
+          dataSource.getRepository(PaymentPointSys);
+      },
+      () => null,
+    );
   }
 
   // Main register Invoice
@@ -59,7 +64,7 @@ export class InvoiceSysService {
     const { person, id: invoiceId } = invoice;
     let codTer: string = '00000';
 
-    const invoiceSys = await this.invoiceSysRepository.findOne({
+    const invoiceSys = await this.invoiceSysRepository?.findOne({
       where: { numRecibo: invoiceId },
     });
 
@@ -75,7 +80,7 @@ export class InvoiceSysService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const thirdParty = await this.thirdPartySysRepository.findOne({
+      const thirdParty = await this.thirdPartySysRepository?.findOne({
         where: { numIdentificacion: invoice.estudianteId },
       });
 
@@ -138,7 +143,7 @@ export class InvoiceSysService {
 
     const { bankAccount } = payment;
 
-    const paymentPoint = await this.paymentPointSysRepository.findOne({
+    const paymentPoint = await this.paymentPointSysRepository?.findOne({
       where: {
         numCuentaBanco: bankAccount.cuentaBanco,
         anioPuntoPago: moment(payment.fecha).year(),
@@ -148,11 +153,11 @@ export class InvoiceSysService {
     if (!payment)
       throw new NotFoundError('No se encontro el punto de pago en sysAPolo');
 
-    const codInvoiceQuery = await this.invoiceSysRepository.query(
+    const codInvoiceQuery = await this.invoiceSysRepository?.query(
       COD_FACTURA_SQL,
     );
 
-    const codDetInvoiceQuery = await this.invoiceSysRepository.query(
+    const codDetInvoiceQuery = await this.invoiceSysRepository?.query(
       COD_DET_FACTURA_SQL,
     );
 
@@ -224,7 +229,7 @@ export class InvoiceSysService {
   ): Promise<string> {
     const { documentType, apellido1, apellido2, nombre1, nombre2 } = person;
 
-    const codTerSql = await this.thirdPartySysRepository.query(COD_TERCERO_SQL);
+    const codTerSql = await this.thirdPartySysRepository?.query(COD_TERCERO_SQL);
 
     if (isEmpty(codTerSql))
       throw new NotFoundError('No se ha podido generar el codigo');
@@ -260,13 +265,13 @@ export class InvoiceSysService {
 
   async deleteInvoiceSysApolo(invoiceId: number): Promise<boolean> {
     try {
-      const invoiceSys = await this.invoiceSysRepository.findOne({
+      const invoiceSys = await this.invoiceSysRepository?.findOne({
         where: { numRecibo: invoiceId },
       });
-      await this.detailInvoiceSysRepository.delete({
+      await this.detailInvoiceSysRepository?.delete({
         facturaId: invoiceSys.id,
       });
-      await this.invoiceSysRepository.delete({ id: invoiceSys.id });
+      await this.invoiceSysRepository?.delete({ id: invoiceSys.id });
       return true;
     } catch (error) {
       return false;
