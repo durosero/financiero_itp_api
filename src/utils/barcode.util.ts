@@ -11,7 +11,8 @@ export const generarCodigoBarrasString = ({
   reference,
   value,
 }: IBarcodeInput): IBarcodeOutput => {
-  const convenio415: string = process.env.CODIGO_CONVENIO ?? '0770999888572';
+  // https://gs1co.org/servicios/codigos-de-barras/calculo-del-digito-de-control
+  const convenio415: string = process.env.CODIGO_CONVENIO ?? '7709998885721';
   let referencia8020: string = reference;
 
   let valor390n: string = value.toString();
