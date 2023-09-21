@@ -1,11 +1,12 @@
 import { resolve } from 'path';
+import { EConnection } from 'src/constants/database.constant';
 import { DataSource } from 'typeorm';
 
 export const databaseProviders = {
-  provide: 'DATA_SOURCE',
+  provide: `DATA_SOURCE_${EConnection.SYSAPOLO}`,
   useFactory: async () => {
     const dataSource = new DataSource({
-      // name: EConnection.SYSAPOLO,
+      name: EConnection.SYSAPOLO,
       type: 'mssql',
       host: process.env.MSSQL_SYSAPOLO_SERVER,
       username: process.env.MSSQL_SYSAPOLO_USER,

@@ -1,23 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty } from 'lodash';
 import * as moment from 'moment';
 import { NotFoundError } from '../../../classes/httpError/notFounError';
 import { UnprocessableEntity } from '../../../classes/httpError/unProcessableEntity';
 
-import { EConnection } from '../../../constants/database.constant';
 import { DeepPartial, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { IInfoInvoice } from '../../../interfaces/enrollment.interface';
 import { IDescriptionSys } from '../../../interfaces/payment.interface';
 import {
   calcularSubTotal,
-  generateDescriptionSys,
+  generateDescriptionSys
 } from '../../../utils/invoice.util';
 import { getVerificationGigit } from '../../../utils/nitConverter.util';
 import {
   COD_DET_FACTURA_SQL,
   COD_FACTURA_SQL,
-  COD_TERCERO_SQL,
+  COD_TERCERO_SQL
 } from '../constant/invoiceSql.constant';
 
 import { Invoice } from '../entities/invoice.entity';
@@ -33,22 +31,22 @@ import { InvoiceRepository } from '../repositories/invoice.repository';
 
 @Injectable()
 export class InvoiceSysService {
+  private invoiceSysRepository: Repository<InvoiceSys>;
+  private detailInvoiceSysRepository: Repository<DetailInvoiceSys>;
+  private thirdPartySysRepository: Repository<ThirdPartySys>;
+  private paymentPointSysRepository: Repository<PaymentPointSys>;
+
   constructor(
-    @InjectRepository(InvoiceSys, EConnection.SYSAPOLO)
-    private invoiceSysRepository: Repository<InvoiceSys>,
-
-    @InjectRepository(DetailInvoiceSys, EConnection.SYSAPOLO)
-    private detailInvoiceSysRepository: Repository<DetailInvoiceSys>,
-
-    @InjectRepository(ThirdPartySys, EConnection.SYSAPOLO)
-    private thirdPartySysRepository: Repository<ThirdPartySys>,
-
-    @InjectRepository(PaymentPointSys, EConnection.SYSAPOLO)
-    private paymentPointSysRepository: Repository<PaymentPointSys>,
-
     private readonly invoiceRepository: InvoiceRepository,
     private readonly detailPaymentRepository: DetailPaymentRepository,
-  ) {}
+  ) {
+    databaseProviders.useFactory().then((dataSource) => {
+      this.invoiceSysRepository = dataSource.getRepository(InvoiceSys);
+      this.detailInvoiceSysRepository = dataSource.getRepository(DetailInvoiceSys);
+      this.thirdPartySysRepository = dataSource.getRepository(ThirdPartySys);
+      this.paymentPointSysRepository = dataSource.getRepository(PaymentPointSys);
+    });
+  }
 
   // Main register Invoice
   async registerInvoiceSysApolo(invoiceIdParam: number): Promise<boolean> {

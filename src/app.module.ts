@@ -32,47 +32,7 @@ import { TasksService } from './services/tasks.service';
       synchronize: false,
       logging: 'all',
     }),
-
-    // TypeOrmModule.forRootAsync({
-    //   // Use useFactory, useClass, or useExisting
-    //   // to configure the DataSourceOptions.
-    //   inject: [config.KEY, 'DATA_SOURCE'],
-
-    //   useFactory: async (configConstant: ConfigType<typeof config>) => {
-    //     return {
-    //       ...configConstant.database,
-    //       type: 'mssql',
-    //       logging: 'all',
-    //       datasource: '',
-    //     };
-    //   },
-    //   // dataSource receives the configured DataSourceOptions
-    //   // and returns a Promise<DataSource>.
-    //   dataSourceFactory: async (options) => {
-    //     const dataSource = await new DataSource(options).initialize();
-    //     return dataSource;
-    //   },
-    // }),
-
-    TypeOrmModule.forRoot({
-      name: EConnection.SYSAPOLO,
-      type: 'mssql',
-      host: process.env.MSSQL_SYSAPOLO_SERVER,
-      username: process.env.MSSQL_SYSAPOLO_USER,
-      password: process.env.MSSQL_SYSAPOLO_PASS,
-      database: process.env.MSSQL_SYSAPOLO_DATABASE,
-      entities: [],
-      autoLoadEntities: true,
-      options: {
-        encrypt: false,
-        trustServerCertificate: true,
-      },
-      synchronize: false,
-      logging: 'all',
-    }),
-
     ScheduleModule.forRoot(),
-
     InvoiceModule,
   ],
   controllers: [AppController],

@@ -75,10 +75,6 @@ import { InvoiceSysService } from './services/invoiceSys.service';
       UniversityPeriod,
     ]),
 
-    TypeOrmModule.forFeature(
-      [InvoiceSys, DetailInvoiceSys, ThirdPartySys, PaymentPointSys],
-      EConnection.SYSAPOLO,
-    ),
     MailerModule.forRootAsync({
       useFactory: async () => ({
         transport: {
