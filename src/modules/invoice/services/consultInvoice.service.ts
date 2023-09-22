@@ -115,10 +115,13 @@ export class ConsultInvoiceService {
 
     const { packageDetail, categoriaId } = packageInvoce;
 
-    const { infoEstudiante: infoMatricula } = params;
+    const { infoEstudiante: infoMatricula, total } = params;
 
     const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(packageDetail),
+      createDetailInvoice({
+        packageDetail,
+        total,
+      }),
     );
 
     const infoClient: IInfoInvoice = {
@@ -175,12 +178,12 @@ export class ConsultInvoiceService {
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
     const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(
+      createDetailInvoice({
         packageDetail,
         aumentoExtra,
         descuentoExtra,
-        cantidad,
-      ),
+        quantity: cantidad,
+      }),
     );
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
@@ -249,7 +252,7 @@ export class ConsultInvoiceService {
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
     const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(packageDetail, aumentoExtra, descuentoExtra),
+      createDetailInvoice({ packageDetail, aumentoExtra, descuentoExtra }),
     );
 
     const infoClient: IInfoInvoice = {
@@ -342,12 +345,12 @@ export class ConsultInvoiceService {
     }
 
     const detailInvoice = this.detailInvoiceRepository.create(
-      createDetailInvoice(
+      createDetailInvoice({
         packageDetail,
         aumentoExtra,
         descuentoExtra,
         quantity,
-      ),
+      }),
     );
     const infoClient: IInfoInvoice = {
       info_cliente: params.infoEstudiante,

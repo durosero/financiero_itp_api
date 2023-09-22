@@ -1,5 +1,6 @@
 import StreamTransport from 'nodemailer/lib/stream-transport';
 import { Discounts } from 'src/modules/invoice/entities/discounts.entity';
+import { PackageDetail } from 'src/modules/invoice/entities/packageDetail.entity';
 import { UniversityPeriod } from 'src/modules/invoice/entities/univsityPeriod.entity';
 import { IInfoInvoice, IStudent } from './enrollment.interface';
 
@@ -31,4 +32,12 @@ export interface IInvoiceResponse {
   error: boolean;
   message: string;
   invoiceId?: number;
+}
+
+export interface ICreateDetailInvoice {
+  packageDetail: PackageDetail[];
+  aumentoExtra?: number;
+  descuentoExtra?: number;
+  quantity?: number;
+  total?: number;
 }
