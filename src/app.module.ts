@@ -35,7 +35,7 @@ import { join } from 'path';
       logging: 'all',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src/assets'),
+      rootPath: join(__dirname, 'assets'),
     }),
     ScheduleModule.forRoot(),
     InvoiceModule,
