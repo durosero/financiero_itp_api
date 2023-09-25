@@ -1,18 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import config from './config/config';
 import { getEnvirontment } from './config/environments';
-import { EConnection } from './constants/database.constant';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { TasksService } from './services/tasks.service';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 @Module({
   imports: [
@@ -36,6 +34,7 @@ import { join } from 'path';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'assets'),
+      serveRoot: `${process.env.GLOBAL_PEFIX}/assets/`,
     }),
     ScheduleModule.forRoot(),
     InvoiceModule,
