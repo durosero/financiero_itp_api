@@ -1,6 +1,5 @@
-import { Injectable, Param } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isNull, isEmpty } from 'lodash';
 import { resolve } from 'path';
 import { NotFoundError } from 'src/classes/httpError/notFounError';
 import { UnprocessableEntity } from 'src/classes/httpError/unProcessableEntity';
@@ -8,26 +7,25 @@ import { getBaseUrl } from 'src/config/environments';
 import { IEnrollment, IInfoInvoice } from 'src/interfaces/enrollment.interface';
 import {
   IGenerateInvoice,
-  IInvicePdfParams,
+  IInvicePdfParams
 } from 'src/interfaces/invoice.interface';
-import { BASE_URL } from 'src/main';
 import { generarCodigoBarras } from 'src/utils/barcode.util';
 import {
   calcularTotales,
   calcularTotalExtraOrdinario,
   createQRBase64,
   generateEndDatePayment,
-  llenarSubTotal,
+  llenarSubTotal
 } from 'src/utils/invoice.util';
 import {
   compileHBS,
   convertHTMLtoPDF,
-  initializeHelpersHbs,
+  initializeHelpersHbs
 } from 'src/utils/reportPdf.util';
 import { DataSource, Repository } from 'typeorm';
 import {
   INFO_MATRICULA_SQL,
-  INFO_PROGRAMA_SQL,
+  INFO_PROGRAMA_SQL
 } from '../constant/invoiceSql.constant';
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
@@ -193,7 +191,7 @@ export class GenerateInvoiceService {
         period,
         qrBase64,
         generated: new Date(),
-        BASE_URL
+        BASE_URL: getBaseUrl(),
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -219,7 +217,7 @@ export class GenerateInvoiceService {
         period,
         qrBase64,
         generated: new Date(),
-        BASE_URL
+        BASE_URL: getBaseUrl(),
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -245,7 +243,7 @@ export class GenerateInvoiceService {
       limitDate,
       qrBase64,
       generated: new Date(),
-      BASE_URL,
+      BASE_URL: getBaseUrl(),
     };
     const pathTemplateBody = resolve(
       __dirname,
