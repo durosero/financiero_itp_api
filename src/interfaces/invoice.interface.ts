@@ -25,6 +25,7 @@ export interface IInvicePdfParams {
   qrBase64?: string;
   generated?: Date;
   limitDate?: Date;
+  BASE_URL?: string;
 }
 
 export interface IInvoiceResponse {

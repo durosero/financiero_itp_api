@@ -10,6 +10,7 @@ import {
   IGenerateInvoice,
   IInvicePdfParams,
 } from 'src/interfaces/invoice.interface';
+import { BASE_URL } from 'src/main';
 import { generarCodigoBarras } from 'src/utils/barcode.util';
 import {
   calcularTotales,
@@ -192,6 +193,7 @@ export class GenerateInvoiceService {
         period,
         qrBase64,
         generated: new Date(),
+        BASE_URL
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -217,6 +219,7 @@ export class GenerateInvoiceService {
         period,
         qrBase64,
         generated: new Date(),
+        BASE_URL
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -242,6 +245,7 @@ export class GenerateInvoiceService {
       limitDate,
       qrBase64,
       generated: new Date(),
+      BASE_URL,
     };
     const pathTemplateBody = resolve(
       __dirname,

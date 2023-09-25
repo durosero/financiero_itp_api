@@ -12,11 +12,12 @@ export interface IResponseConsult {
 export interface IBarcodeInput {
   limitDate: Date;
   reference: string;
+  clientId?: string | null;
   value: number;
 }
 
 export interface IBarcodeOutput {
   barcode: string;
-  barcodeText: string ;
-  barcodeSvg?: string ;
+  barcodeText: string;
+  barcodeSvg?: string;
 }

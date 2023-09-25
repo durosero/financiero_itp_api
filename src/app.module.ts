@@ -11,6 +11,8 @@ import { getEnvirontment } from './config/environments';
 import { EConnection } from './constants/database.constant';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { TasksService } from './services/tasks.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -31,6 +33,9 @@ import { TasksService } from './services/tasks.service';
       autoLoadEntities: true,
       synchronize: false,
       logging: 'all',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'src/assets'),
     }),
     ScheduleModule.forRoot(),
     InvoiceModule,

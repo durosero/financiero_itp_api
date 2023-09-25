@@ -113,8 +113,7 @@
         <table border="0" cellpadding="1" class="" cellspacing="1" style="width: 100%; font-size: 10px;">
             <tr>
                 <td rowspan="4">
-                    <img class="img img-fluid" alt="" style="height: 120px;"
-                        src="https://sibcolombia.net/wp-content/uploads/2017/08/logo-itp.png" />
+                    <img class="img img-fluid" alt="" style="height: 120px;" src="{{BASE_URL}}/logos/itp.svg" />
 
                 </td>
                 <td>
@@ -172,7 +171,7 @@
             <tr>
                 <td colspan="2">Nombre: {{infoStudent.ape1_persona }} {{ infoStudent.ape2_persona }} {{
                     infoStudent.nom1_persona }} {{ infoStudent.nom2_persona}}</td>
-                <td rowspan="2" >Pago ordinario hasta : <strong style="float: right;">{{formatDateSimple
+                <td rowspan="2">Pago ordinario hasta : <strong style="float: right;">{{formatDateSimple
                         period.fecFinInsNuevos}}</strong></td>
             </tr>
 
@@ -207,9 +206,14 @@
             </tr>
             <tr>
                 <td rowspan="2" colspan="2" style="width: 70%;">
-                    <small style="font-size: 10px; ">Páguese en efectivo en el banco <strong>BBVA</strong>. Exija en
-                        esta factura el timbre de una maquina registradora o sello de cancelación del banco y consérvelo
-                        en caso de reclamo. Esta boleta se debe pagar en efectivo</small>
+                    <small style="font-size: 10px; ">Páguese en efectivo en cualquera de los siguientes medios:
+                    </small><br>
+                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/logos/bancopopular.png" />
+                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/logos/efecty.png" />
+                    &nbsp;
+                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/logos/supergiros.png" />
+
+
                 </td>
                 <td style="background: #64dd17;"> Pago ordinario :
                     <Strong style="float: right;">
@@ -219,7 +223,7 @@
 
             </tr>
 
-   
+
 
         </table>
 
