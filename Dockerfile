@@ -46,7 +46,7 @@ ENV PATH /usr/app/node_modules/.bin:$PATH
 COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
-COPY *.env .
+COPY *.env ./
 
 CMD [ "node","dist/main" ]
 
