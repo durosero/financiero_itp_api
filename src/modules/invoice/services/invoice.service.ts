@@ -111,7 +111,7 @@ export class InvoiceService {
         formaPagoId: EFormPayment.EFECTIVO,
         codigoTransaccion: transactionCode,
         bancoRecaudoId: bankId,
-        nombreBanco: 'BANCO POPULAR',
+        nombreBanco: payload.name_bank,
       };
 
       const invoice: DeepPartial<Invoice> = {
