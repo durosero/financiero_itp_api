@@ -3,8 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { isEmpty } from 'lodash';
 import Mail from 'nodemailer/lib/mailer';
 import { resolve } from 'path';
-import { DataSource, DeepPartial, In } from 'typeorm';
-import { IInfoInvoice } from '../../../interfaces/enrollment.interface';
+import { DataSource, DeepPartial, In, Repository } from 'typeorm';
+import {
+  IEnrollment,
+  IInfoInvoice,
+} from '../../../interfaces/enrollment.interface';
 import {
   IPaymentReceipt,
   IPaymentRegister,
@@ -28,6 +31,7 @@ import { ReversePaymentDto } from '../dto/reverse-payment.dto';
 import { DetailPayment } from '../entities/detailPayment.entity';
 import { Invoice } from '../entities/invoice.entity';
 import {
+  EDiscountStatus,
   EFormPayment,
   EOnlinePayment,
   ESeverityCode,
@@ -38,6 +42,10 @@ import { DetailPaymentRepository } from '../repositories/detailPayment.repositor
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceSysService } from './invoiceSys.service';
 import { getBaseUrl } from 'src/config/environments';
+import { DiscountRepository } from '../repositories/discount.repository';
+import { Discounts } from '../entities/discounts.entity';
+import { InvoiceDiscounts } from '../entities/invoiceDiscounts.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -46,6 +54,11 @@ export class InvoiceService {
     private readonly invoiceRepository: InvoiceRepository,
     private readonly dataSource: DataSource,
     private mailerService: MailerService,
+
+    private discountRepository: DiscountRepository,
+
+    @InjectRepository(InvoiceDiscounts)
+    private invoiceDiscountsRepository: Repository<InvoiceDiscounts>,
   ) {}
 
   async registerPaymentCash(payload: IPaymentRegister, invoice: Invoice) {
@@ -59,7 +72,19 @@ export class InvoiceService {
     const registered = await this.registerPaymentInvoiceSigedin(payload);
 
     if (registered) {
-      const { person, categoryInvoice } = invoice;
+      const { person, categoryInvoice, categoriaPagoId, jsonResponse } =
+        invoice;
+      const infoMatricula: IEnrollment = JSON.parse(jsonResponse);
+
+      const discounts = await this.discountRepository.findForEnrollment(
+        categoriaPagoId,
+        infoMatricula?.ide_persona,
+        infoMatricula?.cod_periodo,
+      );
+
+      //TODO: register discount
+
+      await this.registerDiscuountInvoice(invoice.id, discounts);
 
       this.getPdfPaymentReceipt(searchData.invoiceId)
         .then((buffer) => {
@@ -168,6 +193,7 @@ export class InvoiceService {
     const deleted = await this.deletePaymentInvoiceSigedin(payload, ids);
     if (deleted) {
       this.invoiceSysService.deleteInvoiceSysApolo(payload.referencia_pago);
+      this.deleteDiscuountInvoice(payload.referencia_pago);
       return ESeverityCode.INFORMATIVE;
     }
 
@@ -265,6 +291,74 @@ export class InvoiceService {
     const invoice = await this.invoiceRepository.findById(invoiceId);
     if (!invoice)
       throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
-    return invoice;
+  }
+
+  async registerDiscuountInvoice(
+    invoiceId: number,
+    discounts: Discounts[],
+  ): Promise<boolean> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      const ids = discounts.map((dto) => dto.id);
+      const insertDiscounts = discounts.map((discount) => {
+        return this.invoiceDiscountsRepository.create({
+          facturaId: invoiceId,
+          porcentajeSoporteId: discount.id,
+        });
+      });
+
+      await queryRunner.manager.update(
+        Discounts,
+        {
+          id: In(ids),
+        },
+        { porcentajeEstadoId: EDiscountStatus.FACTURADO },
+      );
+
+      await queryRunner.manager.insert(InvoiceDiscounts, insertDiscounts);
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return true;
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      return false;
+    }
+  }
+
+  async deleteDiscuountInvoice(invoiceId: number): Promise<boolean> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      const invoiceDiscounts = await this.invoiceDiscountsRepository.find({
+        where: { facturaId: invoiceId },
+      });
+
+      const ids = invoiceDiscounts.map((dto) => dto.porcentajeSoporteId);
+
+      await queryRunner.manager.update(
+        Discounts,
+        {
+          id: In(ids),
+        },
+        { porcentajeEstadoId: EDiscountStatus.APROBADO },
+      );
+
+      await queryRunner.manager.delete(InvoiceDiscounts, {
+        facturaId: invoiceId,
+      });
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return true;
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      return false;
+    }
   }
 }

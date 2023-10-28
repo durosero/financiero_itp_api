@@ -317,6 +317,7 @@ export class ConsultInvoiceService {
           codColegio: infoMatricula.cod_colegio,
         },
       }),
+
       this.discountRepository.findForEnrollment(
         categoriaId,
         infoMatricula.ide_persona,
