@@ -82,7 +82,7 @@ export class InvoiceService {
         infoMatricula?.cod_periodo,
       );
 
-      await this.registerDiscuountInvoice(invoice.id, discounts);
+      await this.registerDiscuountInvoice(payload.invoiceId, discounts);
 
       this.getPdfPaymentReceipt(searchData.invoiceId)
         .then((buffer) => {
@@ -300,20 +300,24 @@ export class InvoiceService {
 
     try {
       const ids = discounts.map((dto) => dto.id);
-      const insertDiscounts = discounts.map((discount) => {
-        return this.invoiceDiscountsRepository.create({
-          facturaId: invoiceId,
-          porcentajeSoporteId: discount.id,
-        });
-      });
-
-      await queryRunner.manager.update(
-        Discounts,
-        {
-          id: In(ids),
+      const insertDiscounts = discounts.map<DeepPartial<InvoiceDiscounts>>(
+        (discount) => {
+          return {
+            facturaId: invoiceId,
+            porcentajeSoporteId: discount.id,
+          };
         },
-        { porcentajeEstadoId: EDiscountStatus.FACTURADO },
       );
+
+      for (const dto of discounts) {
+        await queryRunner.manager.update(
+          Discounts,
+          {
+            id: dto.id,
+          },
+          { porcentajeEstadoId: EDiscountStatus.FACTURADO },
+        );
+      }
 
       await queryRunner.manager.insert(InvoiceDiscounts, insertDiscounts);
 
