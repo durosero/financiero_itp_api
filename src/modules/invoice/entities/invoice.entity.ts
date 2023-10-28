@@ -5,7 +5,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import {
@@ -16,6 +15,7 @@ import {
 import { CategoryInvoice } from './categoryInvoice.entity';
 import { DetailInvoice } from './detailInvoice.entity';
 import { DetailPayment } from './detailPayment.entity';
+import { InvoiceDiscounts } from './invoiceDiscounts.entity';
 import { Person } from './person.entity';
 
 @Index('PRIMARY', ['id'], { unique: true })
@@ -108,6 +108,12 @@ export class Invoice {
     cascade: true,
   })
   detailInvoices: DetailInvoice[];
+
+  @OneToMany(
+    () => InvoiceDiscounts,
+    (invoiceDiscount) => invoiceDiscount.invoice,
+  )
+  invoiceDiscounts: InvoiceDiscounts[];
 
   @OneToMany(() => DetailPayment, (detailPayments) => detailPayments.invoice)
   detailPayments: DetailPayment[];

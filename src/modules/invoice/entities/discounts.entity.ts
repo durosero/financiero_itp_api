@@ -4,10 +4,12 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { EDiscountStatus } from '../enums/invoice.enum';
 import { DiscountCategory } from './discountCategory.entity';
+import { InvoiceDiscounts } from './invoiceDiscounts.entity';
 import { PackageConfiguration } from './packageConfiguration.entity';
 
 @Index('PRIMARY', ['id'], { unique: true })
@@ -83,6 +85,16 @@ export class Discounts {
   @JoinColumn([{ name: 'porcentaje_categoria_id', referencedColumnName: 'id' }])
   discountCategory: DiscountCategory;
 
+  @ManyToOne(
+    () => PackageConfiguration,
+    (packageConfiguration) => packageConfiguration.discounts,
+  )
   @JoinColumn([{ name: 'config_id', referencedColumnName: 'id' }])
   config: PackageConfiguration;
+
+  @OneToMany(
+    () => InvoiceDiscounts,
+    (invoiceDiscount) => invoiceDiscount.discount,
+  )
+  invoiceDiscounts: InvoiceDiscounts[];
 }
