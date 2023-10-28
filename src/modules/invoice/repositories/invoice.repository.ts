@@ -34,6 +34,8 @@ export class InvoiceRepository extends Repository<Invoice> {
       .innerJoinAndSelect('per.documentType', 'dt')
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
       .leftJoinAndSelect('inv.detailPayments', 'dtPay')
+      .leftJoinAndSelect('inv.invoiceDiscounts', 'dcInv')
+      .leftJoinAndSelect('dcInv.discount', 'desc')
       .leftJoinAndSelect('dtPay.statusPayment', 'stp')
       .innerJoinAndSelect('dtIv.concept', 'cnp')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')

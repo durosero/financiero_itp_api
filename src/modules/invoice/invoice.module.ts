@@ -3,7 +3,6 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { EConnection } from '../../constants/database.constant';
 import { AUTH_EMAIL } from '../../constants/email.constant';
 import { BbvaCashController } from './bbvaCash.controller';
 import { BankAccount } from './entities/bankAccount.entity';
@@ -16,15 +15,12 @@ import { Discounts } from './entities/discounts.entity';
 import { DocumentType } from './entities/documentType.entity';
 import { FormOfPayment } from './entities/formOfPayment.entity';
 import { Invoice } from './entities/invoice.entity';
+import { InvoiceDiscounts } from './entities/invoiceDiscounts.entity';
 import { Package } from './entities/package.entity';
 import { PackageConfiguration } from './entities/packageConfiguration.entity';
 import { PackageDetail } from './entities/packageDetail.entity';
 import { Person } from './entities/person.entity';
 import { StatusPayment } from './entities/statusPayment.entity';
-import { DetailInvoiceSys } from './entities/SysApolo/detailInvoiceSys.entity';
-import { InvoiceSys } from './entities/SysApolo/invoiceSys.entity';
-import { PaymentPointSys } from './entities/SysApolo/paymentPointSys.entity';
-import { ThirdPartySys } from './entities/SysApolo/thirdPartySys.entity';
 import { UniversityPeriod } from './entities/univsityPeriod.entity';
 import { InvoiceController } from './invoice.controller';
 import { BbvaAuthMiddleware } from './middlewares/bbvaAuth.middleware';
@@ -73,6 +69,7 @@ import { InvoiceSysService } from './services/invoiceSys.service';
       Discounts,
       DiscountCategory,
       UniversityPeriod,
+      InvoiceDiscounts
     ]),
 
     MailerModule.forRootAsync({
@@ -108,6 +105,10 @@ export class InvoiceModule {
     });
     consumer.apply(BbvaAuthMiddleware).forRoutes({
       path: 'caja/bbva/consultarfactura',
+      method: RequestMethod.POST,
+    });
+    consumer.apply(BbvaAuthMiddleware).forRoutes({
+      path: 'caja/bbva/registrarpagos',
       method: RequestMethod.POST,
     });
     consumer.apply(BbvaAuthMiddleware).forRoutes({
