@@ -7,7 +7,7 @@ import { getBaseUrl } from 'src/config/environments';
 import { IEnrollment, IInfoInvoice } from 'src/interfaces/enrollment.interface';
 import {
   IGenerateInvoice,
-  IInvicePdfParams
+  IInvicePdfParams,
 } from 'src/interfaces/invoice.interface';
 import { generarCodigoBarras } from 'src/utils/barcode.util';
 import {
@@ -15,17 +15,18 @@ import {
   calcularTotalExtraOrdinario,
   createQRBase64,
   generateEndDatePayment,
-  llenarSubTotal
+  llenarSubTotal,
+  llenarSubTotalSinAumento,
 } from 'src/utils/invoice.util';
 import {
   compileHBS,
   convertHTMLtoPDF,
-  initializeHelpersHbs
+  initializeHelpersHbs,
 } from 'src/utils/reportPdf.util';
 import { DataSource, Repository } from 'typeorm';
 import {
   INFO_MATRICULA_SQL,
-  INFO_PROGRAMA_SQL
+  INFO_PROGRAMA_SQL,
 } from '../constant/invoiceSql.constant';
 import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
@@ -169,6 +170,8 @@ export class GenerateInvoiceService {
     initializeHelpersHbs();
 
     if (invoice.categoriaPagoId == ECategoryInvoice.MATRICULA) {
+      invoice.detailInvoices = llenarSubTotalSinAumento(detailInvoices);
+
       const barcodeOrd = generarCodigoBarras({
         limitDate: period.fecFinMatOrdinaria,
         reference: invoice.id.toString(),

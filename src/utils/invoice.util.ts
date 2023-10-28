@@ -155,3 +155,18 @@ export const createQRBase64 = async (
 export const isOnlinePay = (online: string) => {
   return online == EOnlinePayment.SI;
 };
+
+export const llenarSubTotalSinAumento = (
+  detInvoice: DetailInvoice[],
+): DetailInvoice[] => {
+  return detInvoice.map((detail) => {
+    const { valorUnidad, cantidad, descuento } = detail;
+    const subtotal = valorUnidad * cantidad;
+    const subtotalDescuento = subtotal * descuento;
+
+    return {
+      ...detail,
+      subtotal: subtotal - subtotalDescuento,
+    };
+  });
+};
