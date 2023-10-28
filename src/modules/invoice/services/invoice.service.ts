@@ -82,8 +82,6 @@ export class InvoiceService {
         infoMatricula?.cod_periodo,
       );
 
-      //TODO: register discount
-
       await this.registerDiscuountInvoice(invoice.id, discounts);
 
       this.getPdfPaymentReceipt(searchData.invoiceId)
@@ -291,6 +289,7 @@ export class InvoiceService {
     const invoice = await this.invoiceRepository.findById(invoiceId);
     if (!invoice)
       throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+    return invoice;
   }
 
   async registerDiscuountInvoice(
