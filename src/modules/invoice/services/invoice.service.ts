@@ -299,6 +299,8 @@ export class InvoiceService {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
       const ids = discounts.map((dto) => dto.id);
       const insertDiscounts = discounts.map<DeepPartial<InvoiceDiscounts>>(
         (discount) => {
@@ -336,6 +338,8 @@ export class InvoiceService {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
       const invoiceDiscounts = await this.invoiceDiscountsRepository.find({
         where: { facturaId: invoiceId },
       });
