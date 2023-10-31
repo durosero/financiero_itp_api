@@ -33,12 +33,13 @@ export class InvoiceRepository extends Repository<Invoice> {
       .innerJoinAndSelect('inv.person', 'per')
       .innerJoinAndSelect('per.documentType', 'dt')
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
+      .innerJoinAndSelect('dtIv.concept', 'cnp')
       .leftJoinAndSelect('inv.detailPayments', 'dtPay')
+      .leftJoinAndSelect('dtPay.statusPayment', 'stp')
+      .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .leftJoinAndSelect('inv.invoiceDiscounts', 'dcInv')
       .leftJoinAndSelect('dcInv.discount', 'desc')
-      .leftJoinAndSelect('dtPay.statusPayment', 'stp')
-      .innerJoinAndSelect('dtIv.concept', 'cnp')
-      .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
+      .leftJoinAndSelect('desc.discountCategory', 'desCat')
       .where('inv.id = :invoiceId', { invoiceId })
       .getOne();
   }
@@ -63,6 +64,9 @@ export class InvoiceRepository extends Repository<Invoice> {
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .innerJoinAndSelect('dtPay.formOfPayment', 'frPI')
       .innerJoinAndSelect('dtPay.statusPayment', 'stp')
+      .leftJoinAndSelect('inv.invoiceDiscounts', 'dcInv')
+      .leftJoinAndSelect('dcInv.discount', 'desc')
+      .leftJoinAndSelect('desc.discountCategory', 'desCat')
       .where('inv.id = :invoiceId', { invoiceId })
       .andWhere('dtPay.estadoPagoId = :estadoPago', {
         estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,

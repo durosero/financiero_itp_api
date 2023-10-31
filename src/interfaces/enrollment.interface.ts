@@ -48,5 +48,5 @@ export interface IStudent {
 }
 
 export interface IInfoInvoice {
-  info_cliente: IStudent;
+  info_cliente: IStudent | IEnrollment;
 }

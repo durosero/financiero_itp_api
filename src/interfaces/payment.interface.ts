@@ -36,6 +36,14 @@ export interface ITotales {
   totalCompleto?: number;
 }
 
+export interface IDiscount {
+  id: number;
+  fecha?: Date;
+  porcentajeEstadoId?: number;
+  discountCategory?: string;
+  porcentaje: number;
+}
+
 export interface IPaymentReceipt {
   client: IStudent;
   invoice?: Partial<Invoice>;
@@ -45,4 +53,5 @@ export interface IPaymentReceipt {
   totalInt?: number;
   qrBase64?: string;
   url?: string;
+  discounts?: IDiscount[];
 }

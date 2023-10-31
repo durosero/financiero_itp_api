@@ -9,6 +9,7 @@ import {
   IInfoInvoice,
 } from '../../../interfaces/enrollment.interface';
 import {
+  IDiscount,
   IPaymentReceipt,
   IPaymentRegister,
   IPaymentSearch,
@@ -74,7 +75,9 @@ export class InvoiceService {
     if (registered) {
       const { person, categoryInvoice, categoriaPagoId, jsonResponse } =
         invoice;
-      const infoMatricula: IEnrollment = JSON.parse(jsonResponse);
+
+      const { info_cliente: infoMatricula }: IInfoInvoice =
+        JSON.parse(jsonResponse);
 
       const discounts = await this.discountRepository.findForEnrollment(
         categoriaPagoId,
@@ -249,6 +252,7 @@ export class InvoiceService {
       categoryInvoice,
       detailInvoices,
       detailPayments,
+      invoiceDiscounts,
       ...invoice
     } = await this.invoiceRepository.findFullById(invoiceId);
 
@@ -267,6 +271,15 @@ export class InvoiceService {
       totalInt: total,
       qrBase64,
       url,
+      discounts: invoiceDiscounts.map<IDiscount>(({ discount }) => {
+        return {
+          id: discount?.id,
+          discountCategory: discount?.discountCategory?.descripcion,
+          fecha: discount?.fecha,
+          porcentajeEstadoId: discount?.porcentajeEstadoId,
+          porcentaje: discount.porcentaje ?? 0
+        };
+      }),
     };
     const pathTemplateBody = resolve(
       __dirname,
@@ -301,7 +314,7 @@ export class InvoiceService {
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      const ids = discounts.map((dto) => dto.id);
+
       const insertDiscounts = discounts.map<DeepPartial<InvoiceDiscounts>>(
         (discount) => {
           return {

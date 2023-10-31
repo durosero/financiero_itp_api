@@ -224,9 +224,11 @@
                 </td>
                 <td style="text-align: left; font-size: 9px;">
 
-                    {{#each factura.descuentos }}
-                    <li>{{categoria}} {{porcentaje}}%</li>
-                    {{/each}}
+                    <ul style="font-size: 6px; margin: 3px;">
+                        {{#each discounts }}
+                        <li>{{discountCategory}} {{percent porcentaje}} % </li>
+                        {{/each}}
+                    </ul>
 
                 </td>
             </tr>

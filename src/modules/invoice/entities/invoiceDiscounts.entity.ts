@@ -27,7 +27,7 @@ export class InvoiceDiscounts {
   @JoinColumn([{ name: 'pago_id', referencedColumnName: 'id' }])
   invoice: Invoice;
 
-  @ManyToOne(() => Invoice, (discount) => discount.invoiceDiscounts)
+  @ManyToOne(() => Discounts, (discount) => discount.invoiceDiscounts)
   @JoinColumn([{ name: 'porcentaje_soporte_id', referencedColumnName: 'id' }])
   discount: Discounts;
 }
