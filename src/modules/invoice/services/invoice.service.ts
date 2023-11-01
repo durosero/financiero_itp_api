@@ -4,10 +4,7 @@ import { isEmpty } from 'lodash';
 import Mail from 'nodemailer/lib/mailer';
 import { resolve } from 'path';
 import { DataSource, DeepPartial, In, Repository } from 'typeorm';
-import {
-  IEnrollment,
-  IInfoInvoice,
-} from '../../../interfaces/enrollment.interface';
+import { IInfoInvoice } from '../../../interfaces/enrollment.interface';
 import {
   IDiscount,
   IPaymentReceipt,
@@ -21,8 +18,10 @@ import {
   initializeHelpersHbs,
 } from '../../../utils/reportPdf.util';
 
+import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { NotFoundError } from 'src/classes/httpError/notFounError';
+import { getBaseUrl } from 'src/config/environments';
 import {
   calcularTotales,
   createQRBase64,
@@ -30,7 +29,9 @@ import {
 } from '../../../utils/invoice.util';
 import { ReversePaymentDto } from '../dto/reverse-payment.dto';
 import { DetailPayment } from '../entities/detailPayment.entity';
+import { Discounts } from '../entities/discounts.entity';
 import { Invoice } from '../entities/invoice.entity';
+import { InvoiceDiscounts } from '../entities/invoiceDiscounts.entity';
 import {
   EDiscountStatus,
   EFormPayment,
@@ -40,13 +41,10 @@ import {
   ESysApoloStatus,
 } from '../enums/invoice.enum';
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
-import { InvoiceRepository } from '../repositories/invoice.repository';
-import { InvoiceSysService } from './invoiceSys.service';
-import { getBaseUrl } from 'src/config/environments';
 import { DiscountRepository } from '../repositories/discount.repository';
-import { Discounts } from '../entities/discounts.entity';
-import { InvoiceDiscounts } from '../entities/invoiceDiscounts.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InvoiceRepository } from '../repositories/invoice.repository';
+import { ConsultInvoiceService } from './consultInvoice.service';
+import { InvoiceSysService } from './invoiceSys.service';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -277,7 +275,7 @@ export class InvoiceService {
           discountCategory: discount?.discountCategory?.descripcion,
           fecha: discount?.fecha,
           porcentajeEstadoId: discount?.porcentajeEstadoId,
-          porcentaje: discount.porcentaje ?? 0
+          porcentaje: discount.porcentaje ?? 0,
         };
       }),
     };

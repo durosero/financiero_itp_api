@@ -152,8 +152,9 @@ export const createQRBase64 = async (
   });
 };
 
-export const isOnlinePay = (online: string) => {
-  return online == EOnlinePayment.SI;
+export const isOnlinePay = (online: string | undefined) => {
+  if (!online) return false;
+  return online?.toString() == EOnlinePayment.SI;
 };
 
 export const llenarSubTotalSinAumento = (

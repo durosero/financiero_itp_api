@@ -28,6 +28,7 @@ export class InvoiceRepository extends Repository<Invoice> {
         'inv.categoriaPagoId',
         'inv.matriculaId',
         'inv.codPaquete',
+        'inv.isOnline',
         'inv.valor',
       ])
       .innerJoinAndSelect('inv.person', 'per')

@@ -12,6 +12,7 @@ import {
 import { createDetailInvoice } from '../../../utils/adapters/invoiceAdapter.util';
 import {
   calcularTotales,
+  calcularTotalExtraOrdinario,
   generateCodeInvoice,
   generateEndDatePayment,
   isOnlinePay,
@@ -81,9 +82,22 @@ export class ConsultInvoiceService {
       categoriaPagoId,
     };
 
-    //TODO: update items factura   //verifica si ya existe una factura creada con esa matricula y con ese paquete
+    const newInvoice = await this.generateInvoiceByParams(params);
 
-    return this.generateInvoiceByParams(params);
+    if (total == newInvoice.valor) {
+      return newInvoice;
+    }
+
+    await this.detailInvoiceRepository.delete({
+      facturaId: invoiceId,
+    });
+
+    const invoiceSave = this.invoiceRepository.create({
+      ...invoice,
+      ...newInvoice,
+    });
+
+    return this.invoiceRepository.save(invoiceSave);
   }
 
   generateInvoiceByParams(params: IGenerateInvoice): Promise<Invoice> {
