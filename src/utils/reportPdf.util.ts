@@ -75,10 +75,14 @@ export const initializeHelpersHbs = () => {
   });
 
   handlebars.registerHelper('percent', function (value) {
-    return value* 100;
+    return value * 100;
   });
 
   handlebars.registerHelper('formatCurrency', function (value) {
     return currency.format(value, { locale: 'es-CO' }).replace('$', '').trim();
+  });
+
+  handlebars.registerHelper('heightDiscount', function (value) {
+    return value.length + 1;
   });
 };

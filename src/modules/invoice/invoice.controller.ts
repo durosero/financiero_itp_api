@@ -48,8 +48,13 @@ export class InvoiceController {
 
   @Get('info/:id')
   async getInfoInvoice(@Param('id', ParseIntPipe) invoiceId: number) {
-    const invoiceDB = await this.invoiceService.getInfoInvoice(invoiceId);
-    return invoiceDB;
+    const { jsonResponse, ...rest } = await this.invoiceService.getInfoInvoice(
+      invoiceId,
+    );
+    return {
+      jsonResponse: JSON.parse(jsonResponse),
+      ...rest,
+    };
   }
 
   @Post('generate')
