@@ -1,5 +1,6 @@
 import * as QRCode from 'qrcode';
 import { generate } from 'randomstring';
+import { Invoice } from 'src/modules/invoice/entities/invoice.entity';
 import { EOnlinePayment } from 'src/modules/invoice/enums/invoice.enum';
 import { DeepPartial } from 'typeorm';
 import { IStudent } from '../interfaces/enrollment.interface';
@@ -170,4 +171,21 @@ export const llenarSubTotalSinAumento = (
       subtotal: subtotal - subtotalDescuento,
     };
   });
+};
+
+export const hasPaymentInvoice = (invoice: Invoice): boolean => {
+  try {
+    const { detailPayments, detailInvoices } = invoice;
+
+    const { totalCompleto = 0 } = calcularTotales(detailInvoices);
+    const totalPagado = detailPayments
+      .filter(({ estadoPagoId }) => estadoPagoId == 1)
+      .map((pago) => pago.totalPago)
+      .reduce((a, b) => a + b, 0);
+
+    return totalPagado >= totalCompleto;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };

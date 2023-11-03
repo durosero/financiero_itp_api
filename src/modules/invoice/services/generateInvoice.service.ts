@@ -15,6 +15,7 @@ import {
   calcularTotalExtraOrdinario,
   createQRBase64,
   generateEndDatePayment,
+  hasPaymentInvoice,
   llenarSubTotal,
   llenarSubTotalSinAumento,
 } from 'src/utils/invoice.util';
@@ -130,8 +131,7 @@ export class GenerateInvoiceService {
 
     if (!invoice)
       throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
-    const { jsonResponse, categoryInvoice, detailInvoices, detailPayments } =
-      invoice;
+    const { jsonResponse, categoryInvoice, detailInvoices } = invoice;
 
     const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
 
@@ -168,6 +168,7 @@ export class GenerateInvoiceService {
     const qrBase64 = await createQRBase64(url);
 
     initializeHelpersHbs();
+    const hasPayment = hasPaymentInvoice(invoice);
 
     if (invoice.categoriaPagoId == ECategoryInvoice.MATRICULA) {
       invoice.detailInvoices = llenarSubTotalSinAumento(detailInvoices);
@@ -185,8 +186,8 @@ export class GenerateInvoiceService {
 
       const dataReport: IInvicePdfParams = {
         ...invoice,
-        barcodeOrd: barcodeOrd.barcodeSvg,
-        barcodeExt: barcodeExtra.barcodeSvg,
+        barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
+        barcodeExt: !hasPayment ? barcodeExtra.barcodeSvg : '',
         infoStudent: info_cliente,
         discounts,
         totalOrdinario,
@@ -195,6 +196,7 @@ export class GenerateInvoiceService {
         qrBase64,
         generated: new Date(),
         BASE_URL: getBaseUrl(),
+        hasPayment,
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -213,7 +215,7 @@ export class GenerateInvoiceService {
 
       const dataReport: IInvicePdfParams = {
         ...invoice,
-        barcodeOrd: barcodeOrd.barcodeSvg,
+        barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
         infoStudent: info_cliente,
         discounts,
         totalOrdinario,
@@ -221,6 +223,7 @@ export class GenerateInvoiceService {
         qrBase64,
         generated: new Date(),
         BASE_URL: getBaseUrl(),
+        hasPayment,
       };
       const pathTemplateBody = resolve(
         __dirname,
@@ -240,13 +243,14 @@ export class GenerateInvoiceService {
 
     const dataReport: IInvicePdfParams = {
       ...invoice,
-      barcodeOrd: barcodeOrd.barcodeSvg,
+      barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
       infoStudent: info_cliente,
       totalOrdinario,
       limitDate,
       qrBase64,
       generated: new Date(),
       BASE_URL: getBaseUrl(),
+      hasPayment,
     };
     const pathTemplateBody = resolve(
       __dirname,

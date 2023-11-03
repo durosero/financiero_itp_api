@@ -126,26 +126,49 @@
                     Mocoa, Putumayo - Colombia <br>
                 </td>
                 <td style="vertical-align: bottom;">
+
+
+                    {{#ifCond hasPayment false }}
                     <div
                         style="-webkit-transform: rotate(-90deg);  transform: rotate(-90deg);  width: 10px; margin: 2px; text-align: center;">
                         <p>Ordinario</p>
                     </div>
+                    {{/ifCond}}
+
+
+
                 </td>
                 <td style="text-align: right">
+
+
                     {{{barcodeOrd}}}
+
                 </td>
             </tr>
             <tr>
                 <td>
                     Periodo: {{matricula.nom_periodo}}</td>
                 <td rowspan="4" style="vertical-align: bottom;">
+
+
+                    {{#ifCond hasPayment false }}
                     <div
                         style="-webkit-transform: rotate(-90deg); transform: rotate(-90deg);  width: 10px; text-align: center;  margin: 2px;">
                         <p>Extraordinario</p>
                     </div>
+
+                    {{/ifCond}}
+
+
                 </td>
                 <td rowspan="3" style="text-align: right; margin: 0px;">
+
+                    {{#ifCond hasPayment true }}
+                    <small style="background-color: #64dd17; padding: 5px;">Esta factura ya ha sido pagada</small>
+                    {{/ifCond}}
                     {{{barcodeExt}}}
+
+
                 </td>
             </tr>
             <tr>

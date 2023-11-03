@@ -139,6 +139,9 @@
 
                 </td>
                 <td rowspan="3" style="text-align: right; margin: 0px;">
+                    {{#ifCond hasPayment true }}
+                    <small style="background-color: #64dd17; padding: 5px;">Esta factura ya ha sido pagada</small>
+                    {{/ifCond}}
                     {{{barcodeOrd}}}
                 </td>
             </tr>
@@ -208,11 +211,15 @@
             </tr>
             <tr>
                 <td rowspan="2" colspan="2" style="width: 70%;">
-                    <small style="font-size: 10px; ">Páguese en efectivo en cualquera de los siguientes medios: </small><br>
-                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/assets/logos/bancopopular.png" />
-                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/assets/logos/efecty.png" />
+                    <small style="font-size: 10px; ">Páguese en efectivo en cualquera de los siguientes medios:
+                    </small><br>
+                    <img class="img img-fluid" alt="" style="height: 30px;"
+                        src="{{BASE_URL}}/assets/logos/bancopopular.png" />
+                    <img class="img img-fluid" alt="" style="height: 30px;"
+                        src="{{BASE_URL}}/assets/logos/efecty.png" />
                     &nbsp;
-                    <img class="img img-fluid" alt="" style="height: 30px;" src="{{BASE_URL}}/assets/logos/supergiros.png" />
+                    <img class="img img-fluid" alt="" style="height: 30px;"
+                        src="{{BASE_URL}}/assets/logos/supergiros.png" />
 
 
                 </td>

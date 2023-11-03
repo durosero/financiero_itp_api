@@ -26,6 +26,7 @@ export interface IInvicePdfParams {
   generated?: Date;
   limitDate?: Date;
   BASE_URL?: string;
+  hasPayment?: boolean;
 }
 
 export interface IInvoiceResponse {

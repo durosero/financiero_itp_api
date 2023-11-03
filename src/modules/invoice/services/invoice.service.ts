@@ -245,6 +245,11 @@ export class InvoiceService {
   }
 
   async getHTMLPaymentReceipt(invoiceId: number): Promise<string> {
+    const invoiceFull = await this.invoiceRepository.findFullById(invoiceId);
+
+    if (!invoiceFull)
+      throw new NotFoundError(`La factura ${invoiceId}, no ha sido pagada`);
+
     const {
       jsonResponse,
       categoryInvoice,
@@ -252,7 +257,7 @@ export class InvoiceService {
       detailPayments,
       invoiceDiscounts,
       ...invoice
-    } = await this.invoiceRepository.findFullById(invoiceId);
+    } = invoiceFull;
 
     const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
     const { totalExtraordinario: total } = calcularTotales(detailInvoices);
@@ -291,6 +296,7 @@ export class InvoiceService {
   }
 
   async getPdfPaymentReceipt(invoiceId: number): Promise<Buffer> {
+    console.log('klasdjbfksjdbskj');
     const templateHtml = await this.getHTMLPaymentReceipt(invoiceId);
     const buffer = await convertHTMLtoPDF(templateHtml);
     return buffer;
