@@ -34,6 +34,7 @@ import { Invoice } from '../entities/invoice.entity';
 import { InvoiceDiscounts } from '../entities/invoiceDiscounts.entity';
 import {
   EDiscountStatus,
+  EEmailStatus,
   EFormPayment,
   EOnlinePayment,
   ESeverityCode,
@@ -83,34 +84,39 @@ export class InvoiceService {
         infoMatricula?.cod_periodo,
       );
 
-      await this.registerDiscuountInvoice(payload.invoiceId, discounts);
+      this.invoiceSysService.registerInvoiceSysApolo(payload.invoiceId);
 
-      this.getPdfPaymentReceipt(searchData.invoiceId)
-        .then((buffer) => {
-          const attachment: Mail.Attachment = {
-            content: buffer,
-            filename: `${person.id}-${searchData.transactionCode}.pdf`,
-            contentType: 'application/pdf',
-          };
-          const mailOptions: ISendMailOptions = {
-            to:
-              process.env.NODE_ENV != 'pro'
-                ? process.env.EMAIL_TEST
-                : person.email,
-            subject: 'Recibo de pago - Pago exitoso',
-            text: messageEmailPaymentOk(
-              person,
-              categoryInvoice.descripcion,
-              invoice.id,
-            ),
-            attachments: [attachment],
-          };
+      try {
+        await this.registerDiscuountInvoice(payload.invoiceId, discounts);
+        const buffer = await this.getPdfPaymentReceipt(searchData.invoiceId);
 
-          this.mailerService.sendMail(mailOptions);
-        })
-        .catch((error) => {
-          console.log('No se ha podido generar el pdf: ', error);
-        });
+        const attachment: Mail.Attachment = {
+          content: buffer,
+          filename: `${person.id}-${searchData.transactionCode}.pdf`,
+          contentType: 'application/pdf',
+        };
+        const mailOptions: ISendMailOptions = {
+          to:
+            process.env.NODE_ENV != 'pro'
+              ? process.env.EMAIL_TEST
+              : person.email,
+          subject: 'Recibo de pago - Pago exitoso',
+          text: messageEmailPaymentOk(
+            person,
+            categoryInvoice.descripcion,
+            invoice.id,
+          ),
+          attachments: [attachment],
+        };
+
+        await this.mailerService.sendMail(mailOptions);
+        this.invoiceRepository.updateStatusEmailSend(
+          EEmailStatus.ENVIADO,
+          searchData.invoiceId,
+        );
+      } catch (error) {
+        console.log('No se ha podido enviar el recibo de pago: ', error);
+      }
     }
 
     return registered;
