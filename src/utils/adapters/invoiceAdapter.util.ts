@@ -28,7 +28,7 @@ export const createDetailInvoice = ({
         valorUnidad: total > 0 ? total : valorUnidad,
         concept: detail.concept,
         aumento: detail.descuentoExt == '1' ? aumentoExtra + aumento : aumento,
-        cantidad: quantity < 1 ? 1 : quantity,
+        cantidad: Number(quantity < 1 ? 1 : quantity),
         descuento:
           detail.descuentoExt == '1' ? descuentoExtra + descuento : descuento,
       };
