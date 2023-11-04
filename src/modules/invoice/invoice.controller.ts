@@ -6,17 +6,15 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  StreamableFile,
+  StreamableFile
 } from '@nestjs/common';
 import { getBaseUrl } from 'src/config/environments';
 import { IInvoiceResponse } from 'src/interfaces/invoice.interface';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
-import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { GenerateInvoiceService } from './services/generateInvoice.service';
-
+import { isOnlinePay } from '../../utils/invoice.util';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
-import { isOnlinePay } from '../../utils/invoice.util';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -24,7 +22,6 @@ export class InvoiceController {
     private readonly invoiceService: InvoiceService,
     private readonly sysApoloService: InvoiceSysService,
     private readonly generateInvoiceService: GenerateInvoiceService,
-    private readonly consultInvoiceService: ConsultInvoiceService,
   ) {}
 
   @Get('payment/pdf/:id')
@@ -62,8 +59,8 @@ export class InvoiceController {
     const { jsonResponse, ...rest } =
       await this.generateInvoiceService.mainGenerateInvoice(payload);
     return {
-      ...rest,
       jsonResponse: JSON.parse(jsonResponse),
+      ...rest,
     };
   }
 

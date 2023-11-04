@@ -365,6 +365,7 @@ export class ConsultInvoiceService {
         aumentoExtra,
         descuentoExtra,
         quantity,
+        categoriaId
       }),
     );
     const infoClient: IInfoInvoice = {

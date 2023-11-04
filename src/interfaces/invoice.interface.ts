@@ -41,5 +41,6 @@ export interface ICreateDetailInvoice {
   aumentoExtra?: number;
   descuentoExtra?: number;
   quantity?: number;
+  categoriaId?: number;
   total?: number;
 }
