@@ -392,16 +392,17 @@ export class InvoiceService {
   }
 
   async sendPaymentEmail(invoiceId: number): Promise<SentMessageInfo> {
+    const invoice = await this.invoiceRepository.findOneForEmail(invoiceId);
+
+    if (!invoice)
+      throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+
     const {
       person,
       categoryInvoice,
       jsonResponse,
       detailPayments = [],
-      ...invoice
-    } = await this.invoiceRepository.findOneForEmail(invoiceId);
-
-    if (!invoice)
-      throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+    } = invoice;
 
     const paymentFound = detailPayments.find(
       (payment) => payment.estadoPagoId == EStatusInvoice.PAGO_FINALIZADO_OK,
