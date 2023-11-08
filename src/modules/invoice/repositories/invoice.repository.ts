@@ -207,9 +207,6 @@ export class InvoiceRepository extends Repository<Invoice> {
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .innerJoinAndSelect('dtPay.statusPayment', 'stp')
       .where('inv.id = :invoiceId', { invoiceId })
-      .andWhere('dtPay.estadoPagoId = :estadoPago', {
-        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
-      })
       .getOne();
   }
 }
