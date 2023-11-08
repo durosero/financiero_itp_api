@@ -202,7 +202,7 @@ export class InvoiceRepository extends Repository<Invoice> {
         'inv.jsonResponse',
       ])
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
-      .innerJoinAndSelect('inv.detailPayments', 'dtPay')
+      .leftJoinAndSelect('inv.detailPayments', 'dtPay')
       .innerJoinAndSelect('inv.person', 'per')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
       .innerJoinAndSelect('dtPay.statusPayment', 'stp')
