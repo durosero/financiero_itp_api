@@ -191,4 +191,25 @@ export class InvoiceRepository extends Repository<Invoice> {
     }
     return undefined;
   }
+
+  async findOneForEmail(invoiceId) {
+    return this.repository
+      .createQueryBuilder('inv')
+      .select([
+        'inv.id',
+        'inv.jsonResponse',
+        'inv.estadoId',
+        'inv.jsonResponse',
+      ])
+      .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
+      .innerJoinAndSelect('inv.detailPayments', 'dtPay')
+      .innerJoinAndSelect('inv.person', 'per')
+      .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
+      .innerJoinAndSelect('dtPay.statusPayment', 'stp')
+      .where('inv.id = :invoiceId', { invoiceId })
+      .andWhere('dtPay.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
+      })
+      .getOne();
+  }
 }

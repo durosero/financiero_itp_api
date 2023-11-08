@@ -398,16 +398,7 @@ export class InvoiceService {
       jsonResponse,
       detailPayments = [],
       ...invoice
-    } = await this.invoiceRepository.findOne({
-      select: [
-        'id',
-        'jsonResponse',
-        'detailPayments',
-        'person',
-        'categoryInvoice',
-      ],
-      where: { id: invoiceId },
-    });
+    } = await this.invoiceRepository.findOneForEmail(invoiceId);
 
     if (!invoice)
       throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
