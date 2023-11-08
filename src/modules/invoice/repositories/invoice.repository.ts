@@ -205,7 +205,7 @@ export class InvoiceRepository extends Repository<Invoice> {
       .leftJoinAndSelect('inv.detailPayments', 'dtPay')
       .innerJoinAndSelect('inv.person', 'per')
       .leftJoinAndSelect('inv.categoryInvoice', 'invCat')
-      .innerJoinAndSelect('dtPay.statusPayment', 'stp')
+      .leftJoinAndSelect('dtPay.statusPayment', 'stp')
       .where('inv.id = :invoiceId', { invoiceId })
       .getOne();
   }
