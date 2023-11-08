@@ -44,8 +44,8 @@ import {
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
-import { ConsultInvoiceService } from './consultInvoice.service';
 import { InvoiceSysService } from './invoiceSys.service';
+import { SentMessageInfo } from 'nodemailer';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -302,7 +302,6 @@ export class InvoiceService {
   }
 
   async getPdfPaymentReceipt(invoiceId: number): Promise<Buffer> {
-    console.log('klasdjbfksjdbskj');
     const templateHtml = await this.getHTMLPaymentReceipt(invoiceId);
     const buffer = await convertHTMLtoPDF(templateHtml);
     return buffer;
@@ -390,5 +389,65 @@ export class InvoiceService {
       await queryRunner.release();
       return false;
     }
+  }
+
+  async sendPaymentEmail(invoiceId: number): Promise<SentMessageInfo> {
+    const {
+      person,
+      categoryInvoice,
+      jsonResponse,
+      detailPayments = [],
+      ...invoice
+    } = await this.invoiceRepository.findOne({
+      select: [
+        'id',
+        'jsonResponse',
+        'detailPayments',
+        'person',
+        'categoryInvoice',
+      ],
+      where: { id: invoiceId },
+    });
+
+    if (!invoice)
+      throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+
+    const paymentFound = detailPayments.find(
+      (payment) => payment.estadoPagoId == EStatusInvoice.PAGO_FINALIZADO_OK,
+    );
+
+    if (!paymentFound)
+      throw new NotFoundError(`La factura ${invoiceId} no contiene pagos`);
+
+    const { info_cliente }: IInfoInvoice = JSON.parse(jsonResponse);
+    const buffer = await this.getPdfPaymentReceipt(invoiceId);
+
+    const attachment: Mail.Attachment = {
+      content: buffer,
+      filename: `${info_cliente?.ide_persona}-${paymentFound?.bankAccount}.pdf`,
+      contentType: 'application/pdf',
+    };
+    const mailOptions: ISendMailOptions = {
+      to:
+        process.env.NODE_ENV != 'pro'
+          ? process.env.EMAIL_TEST
+          : info_cliente.email_persona,
+      subject: 'Recibo de pago - Pago exitoso',
+      text: messageEmailPaymentOk(
+        person,
+        categoryInvoice.descripcion,
+        invoice.id,
+      ),
+      attachments: [attachment],
+    };
+
+    const sendInfo = await this.mailerService.sendMail(mailOptions);
+
+    this.invoiceRepository.updateStatusEmailSend(
+      EEmailStatus.ENVIADO,
+      invoiceId,
+    );
+
+    return sendInfo;
   }
 }

@@ -6,7 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  StreamableFile
+  StreamableFile,
 } from '@nestjs/common';
 import { getBaseUrl } from 'src/config/environments';
 import { IInvoiceResponse } from 'src/interfaces/invoice.interface';
@@ -41,6 +41,11 @@ export class InvoiceController {
   @Get('register/sysapolo/:id')
   async registerInvoiceSysApolo(@Param('id', ParseIntPipe) invoiceId: number) {
     return this.sysApoloService.registerInvoiceSysApolo(invoiceId);
+  }
+
+  @Get('send/payment/:id')
+  async sendPaymentEmail(@Param('id', ParseIntPipe) invoiceId: number) {
+    return this.invoiceService.sendPaymentEmail(invoiceId);
   }
 
   @Get('info/:id')
