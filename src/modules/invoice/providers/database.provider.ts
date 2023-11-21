@@ -17,7 +17,8 @@ export const databaseProviders = {
         resolve(__dirname, '../entities/SysApolo/**/*.entity{.ts,.js}'),
       ],
       options: {
-        trustServerCertificate: true,
+        trustServerCertificate: false,
+        encrypt: false,
       },
       synchronize: false,
       logging: 'all',

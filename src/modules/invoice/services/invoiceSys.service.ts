@@ -64,11 +64,11 @@ export class InvoiceSysService {
     const { person, id: invoiceId } = invoice;
     let codTer: string = '00000';
 
-    const invoiceSys = await this.invoiceSysRepository?.findOne({
+    const invoiceSys = await this.invoiceSysRepository?.find({
       where: { numRecibo: invoiceId },
     });
 
-    if (invoiceSys) {
+    if (!isEmpty(invoiceSys)) {
       this.invoiceRepository.updateStatusVerifySys(
         ESysApoloStatus.REGISTRADO,
         invoiceId,
