@@ -197,12 +197,16 @@ export class InvoiceSysService {
     const inserDetailInvoice = detailInvoices.map<
       DeepPartial<DetailInvoiceSys>
     >((detail) => {
-      const { cantidad, conceptoId, valorUnidad } = detail;
+      const {
+        cantidad,
+        concept: { codSysapolo },
+        valorUnidad,
+      } = detail;
       idDet++;
       return {
         id: idDet,
         facturaId: codInvoiceQuery[0].cod_factura ?? null,
-        conceptoId,
+        conceptoId: codSysapolo,
         cantidad,
         valorConcepto: valorUnidad,
         subTotal: calcularSubTotal(detail),
