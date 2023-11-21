@@ -416,7 +416,7 @@ export class InvoiceService {
 
     const attachment: Mail.Attachment = {
       content: buffer,
-      filename: `${info_cliente?.ide_persona}-${paymentFound?.bankAccount}.pdf`,
+      filename: `${info_cliente?.ide_persona}-${paymentFound?.facturaId}.pdf`,
       contentType: 'application/pdf',
     };
     const mailOptions: ISendMailOptions = {

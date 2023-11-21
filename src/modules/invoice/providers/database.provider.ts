@@ -12,6 +12,7 @@ export const databaseProviders = {
       username: process.env.MSSQL_SYSAPOLO_USER,
       password: process.env.MSSQL_SYSAPOLO_PASS,
       database: process.env.MSSQL_SYSAPOLO_DATABASE,
+      port: Number(process.env.MSSQL_SYSAPOLO_PORT) || 1433,
       entities: [
         resolve(__dirname, '../entities/SysApolo/**/*.entity{.ts,.js}'),
       ],
