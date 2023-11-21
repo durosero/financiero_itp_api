@@ -64,11 +64,11 @@ export class InvoiceSysService {
     const { person, id: invoiceId } = invoice;
     let codTer: string = '00000';
 
-    const invoiceSys = await this.invoiceSysRepository?.find({
+    const [invoiceSys] = await this.invoiceSysRepository?.find({
       where: { numRecibo: invoiceId },
     });
 
-    if (!isEmpty(invoiceSys)) {
+    if (invoiceSys) {
       this.invoiceRepository.updateStatusVerifySys(
         ESysApoloStatus.REGISTRADO,
         invoiceId,
@@ -80,7 +80,7 @@ export class InvoiceSysService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const thirdParty = await this.thirdPartySysRepository?.findOne({
+      const [thirdParty] = await this.thirdPartySysRepository?.find({
         where: { numIdentificacion: invoice.estudianteId },
       });
 
@@ -143,14 +143,14 @@ export class InvoiceSysService {
 
     const { bankAccount } = payment;
 
-    const paymentPoint = await this.paymentPointSysRepository?.findOne({
+    const [paymentPoint] = await this.paymentPointSysRepository?.find({
       where: {
         numCuentaBanco: bankAccount.cuentaBanco,
         anioPuntoPago: moment(payment.fecha).year(),
       },
     });
 
-    if (!payment)
+    if (!paymentPoint)
       throw new NotFoundError('No se encontro el punto de pago en sysAPolo');
 
     const codInvoiceQuery = await this.invoiceSysRepository?.query(
@@ -229,7 +229,9 @@ export class InvoiceSysService {
   ): Promise<string> {
     const { documentType, apellido1, apellido2, nombre1, nombre2 } = person;
 
-    const codTerSql = await this.thirdPartySysRepository?.query(COD_TERCERO_SQL);
+    const codTerSql = await this.thirdPartySysRepository?.query(
+      COD_TERCERO_SQL,
+    );
 
     if (isEmpty(codTerSql))
       throw new NotFoundError('No se ha podido generar el codigo');
@@ -265,7 +267,7 @@ export class InvoiceSysService {
 
   async deleteInvoiceSysApolo(invoiceId: number): Promise<boolean> {
     try {
-      const invoiceSys = await this.invoiceSysRepository?.findOne({
+      const [invoiceSys] = await this.invoiceSysRepository?.find({
         where: { numRecibo: invoiceId },
       });
       await this.detailInvoiceSysRepository?.delete({
