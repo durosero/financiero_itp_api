@@ -109,13 +109,19 @@ export class InvoiceService {
           attachments: [attachment],
         };
 
-        await this.mailerService.sendMail(mailOptions);
-        this.invoiceRepository.updateStatusEmailSend(
-          EEmailStatus.ENVIADO,
-          searchData.invoiceId,
-        );
+        this.mailerService
+          .sendMail(mailOptions)
+          .then(() => {
+            this.invoiceRepository.updateStatusEmailSend(
+              EEmailStatus.ENVIADO,
+              searchData.invoiceId,
+            );
+          })
+          .catch((error) => {
+            console.log('No se ha podido enviar el recibo de pago: ', error);
+          });
       } catch (error) {
-        console.log('No se ha podido enviar el recibo de pago: ', error);
+        console.log('No se ha podido registrar los descuentos: ', error);
       }
     }
 

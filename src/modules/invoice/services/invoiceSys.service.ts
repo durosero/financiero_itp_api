@@ -73,7 +73,9 @@ export class InvoiceSysService {
         ESysApoloStatus.REGISTRADO,
         invoiceId,
       );
-      throw new UnprocessableEntity('Ya se encuentra la factura');
+      throw new UnprocessableEntity(
+        `La factura ${invoiceId} ya se encuentra en sysApolo`,
+      );
     }
 
     try {
@@ -108,16 +110,19 @@ export class InvoiceSysService {
     }
   }
 
-  async updateThirdParty(dbSys: QueryRunner, person: Person) {
+  async updateThirdParty(dbSys: QueryRunner, person: Person | null) {
     const { documentType, apellido1, apellido2, nombre1, nombre2 } = person;
+    const fullName = `${apellido1} ${apellido2 ?? ''} ${nombre1} ${
+      nombre2 ?? ''
+    }`;
     const thirdPartyUpdate: DeepPartial<ThirdPartySys> = {
       idTipoIdentificacion: documentType.codSysapolo,
       email: person.email,
-      nomTercero: `${apellido1} ${apellido2} ${nombre1} ${nombre2}`,
+      nomTercero: fullName.trim(),
       priApellido: apellido1,
-      segApellido: apellido2,
+      segApellido: apellido2 ?? '',
       priNombre: nombre1,
-      otrNombre: nombre2,
+      otrNombre: nombre2 ?? '',
       dirTercero: person.direccion,
       telTercero: person.phone,
       ideMun: person.codMunicipio,
@@ -243,6 +248,10 @@ export class InvoiceSysService {
     const digVer = getVerificationGigit(person.id);
     const codTer: string = codTerSql[0].cod_ter ?? '00000';
 
+    const fullName = `${apellido1} ${apellido2 ?? ''} ${nombre1} ${
+      nombre2 ?? ''
+    }`;
+
     const thirdPartyCreate: DeepPartial<ThirdPartySys> = {
       id: codTer,
       idTipoIdentificacion: documentType.codSysapolo,
@@ -250,11 +259,11 @@ export class InvoiceSysService {
       numIdentificacion: person.id,
       digVerificacion: digVer,
       email: person.email,
-      nomTercero: `${apellido1} ${apellido2} ${nombre1} ${nombre2}`,
+      nomTercero: fullName.trim(),
       priApellido: apellido1,
-      segApellido: apellido2,
+      segApellido: apellido2 ?? '',
       priNombre: nombre1,
-      otrNombre: nombre2,
+      otrNombre: nombre2 ?? '',
       claTercero: 'S',
       dirTercero: person.direccion,
       telTercero: person.phone,

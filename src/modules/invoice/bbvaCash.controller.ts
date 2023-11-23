@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Logger, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Logger,
+  Post,
+  Req,
+  Request,
+} from '@nestjs/common';
 import * as moment from 'moment';
 import {
   EResponseDescription,
@@ -35,7 +43,12 @@ export class BbvaCashController {
 
   @Post('/consultarfactura')
   @HttpCode(200)
-  async consultarFactura(@Body() payload: BbvaConsultInvoiceDto) {
+  async consultarFactura(
+    @Body() payload: BbvaConsultInvoiceDto,
+    @Req() { headers, body, method, url }: Request,
+  ) {
+    this.logger.debug({ headers, body, method, url });
+
     try {
       const invoice = await this.consultInvoiceService.searchInvoiceForPayment(
         Number(payload.Referencia_pago),
@@ -89,7 +102,12 @@ export class BbvaCashController {
 
   @Post('/registrarpagos')
   @HttpCode(200)
-  async registrarFactura(@Body() payload: BbvaRegisterPaymentDto) {
+  async registrarFactura(
+    @Body() payload: BbvaRegisterPaymentDto,
+    @Req() { headers, body, method, url }: Request,
+  ) {
+    this.logger.debug({ headers, body, method, url });
+
     try {
       const invoice = await this.invoiceRepository.findById(
         Number(payload.Referencia_pago),
