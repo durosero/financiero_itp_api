@@ -68,6 +68,9 @@ export class InvoiceSysService {
         where: { numRecibo: invoiceId },
       });
 
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       if (invoiceSys) {
         this.invoiceRepository.updateStatusVerifySys(
           ESysApoloStatus.REGISTRADO,
@@ -77,9 +80,6 @@ export class InvoiceSysService {
           `La factura ${invoiceId} ya se encuentra en sysApolo`,
         );
       }
-
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
 
       const [thirdParty] = await this.thirdPartySysRepository?.find({
         where: { numIdentificacion: invoice.estudianteId },
