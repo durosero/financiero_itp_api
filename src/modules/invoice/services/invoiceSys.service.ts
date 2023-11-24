@@ -57,28 +57,27 @@ export class InvoiceSysService {
   async registerInvoiceSysApolo(invoiceIdParam: number): Promise<boolean> {
     const dataSource = await databaseProviders.useFactory();
     const queryRunner = dataSource.createQueryRunner();
-
-    const invoice = await this.invoiceRepository.findById(invoiceIdParam);
-    if (!invoice) throw new NotFoundError('Factura no encontrada');
-
-    const { person, id: invoiceId } = invoice;
-    let codTer: string = '00000';
-
-    const [invoiceSys] = await this.invoiceSysRepository?.find({
-      where: { numRecibo: invoiceId },
-    });
-
-    if (invoiceSys) {
-      this.invoiceRepository.updateStatusVerifySys(
-        ESysApoloStatus.REGISTRADO,
-        invoiceId,
-      );
-      throw new UnprocessableEntity(
-        `La factura ${invoiceId} ya se encuentra en sysApolo`,
-      );
-    }
-
     try {
+      const invoice = await this.invoiceRepository.findById(invoiceIdParam);
+      if (!invoice) throw new NotFoundError('Factura no encontrada');
+
+      const { person, id: invoiceId } = invoice;
+      let codTer: string = '00000';
+
+      const [invoiceSys] = await this.invoiceSysRepository?.find({
+        where: { numRecibo: invoiceId },
+      });
+
+      if (invoiceSys) {
+        this.invoiceRepository.updateStatusVerifySys(
+          ESysApoloStatus.REGISTRADO,
+          invoiceId,
+        );
+        throw new UnprocessableEntity(
+          `La factura ${invoiceId} ya se encuentra en sysApolo`,
+        );
+      }
+
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
