@@ -44,7 +44,7 @@ export class BbvaRegisterPaymentDto {
   @IsNotEmpty()
   @Transform(({ value }) => {
     const auxDate = new Date();
-    const dateReverse = moment(value, 'DD/MM/YYYY').toDate();
+    const dateReverse = moment(value, 'DD/MM/YYYY').toDate() || new Date();
     dateReverse.setHours(auxDate.getHours());
     dateReverse.setMinutes(auxDate.getMinutes());
     dateReverse.setSeconds(auxDate.getSeconds());
@@ -65,6 +65,12 @@ export class BbvaRegisterPaymentDto {
   @MaxLength(40)
   @IsNotEmpty()
   Id_transaccion: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(40)
+  @IsOptional()
+  Id_transacción?: string;
 
   @IsString()
   @MaxLength(200)

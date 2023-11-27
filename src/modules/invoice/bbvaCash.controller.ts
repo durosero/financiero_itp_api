@@ -73,8 +73,11 @@ export class BbvaCashController {
   }
 
   @Post('/reversarpagos')
-  @HttpCode(200)
-  async reversarFactura(@Body() payload: BbvaReversePaymentDto) {
+  async reversarFactura(
+    @Body() payload: BbvaReversePaymentDto,
+    @Req() { headers, body, method, url }: Request,
+  ) {
+    this.logger.debug({ headers, body, method, url });
     try {
       const payloadReverse: ReversePaymentDto = {
         codigo_transaccion: payload.Id_transaccion,
@@ -101,13 +104,12 @@ export class BbvaCashController {
   }
 
   @Post('/registrarpagos')
-  @HttpCode(200)
   async registrarFactura(
     @Body() payload: BbvaRegisterPaymentDto,
     @Req() { headers, body, method, url }: Request,
   ) {
     this.logger.debug({ headers, body, method, url });
-
+    //BbvaRegisterPaymentDto
     try {
       const invoice = await this.invoiceRepository.findById(
         Number(payload.Referencia_pago),
@@ -125,6 +127,8 @@ export class BbvaCashController {
         // bankId: EBankCodeCash.BBVA,
         name_bank: EBankCash.BBVA,
       };
+
+      console.log(payload);
 
       const success = await this.invoiceService.registerPaymentCash(
         payloadRegister,
