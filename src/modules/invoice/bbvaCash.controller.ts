@@ -109,7 +109,7 @@ export class BbvaCashController {
     @Req() { headers, body, method, url }: Request,
   ) {
     this.logger.debug({ headers, body, method, url });
-    //BbvaRegisterPaymentDto
+
     try {
       const invoice = await this.invoiceRepository.findById(
         Number(payload.Referencia_pago),
@@ -127,8 +127,6 @@ export class BbvaCashController {
         // bankId: EBankCodeCash.BBVA,
         name_bank: EBankCash.BBVA,
       };
-
-      console.log(payload);
 
       const success = await this.invoiceService.registerPaymentCash(
         payloadRegister,
