@@ -157,8 +157,8 @@ export class InvoiceRepository extends Repository<Invoice> {
       .innerJoinAndSelect('inv.detailInvoices', 'dtIv')
       .leftJoinAndSelect('inv.detailPayments', 'dtPay')
       .innerJoinAndSelect('dtIv.concept', 'cnp')
-      .where('inv.isOnline = :online', {
-        online: EOnlinePayment.NO,
+      .where('inv.isOnline <> :online', {
+        online: EOnlinePayment.SI,
       })
       .andWhere('DATEDIFF(NOW(),inv.fecha) <=3')
       .andWhere({ id: In(ids) })

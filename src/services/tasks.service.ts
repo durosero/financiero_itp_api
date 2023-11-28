@@ -57,24 +57,24 @@ export class TasksService {
     return job.lastDate();
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async checkStatusInvoiceCash() {
-    const invoices = await this.invoiceRepository.findInvoicesCash();
-    try {
-      for (let i = 0; i < invoices.length; i++) {
-        const invoice = invoices[i];
-        setTimeout(async () => {
-          const responseBank = await getStatusInvoicePaymentWs(
-            invoice.toString(),
-          );
-          const registerInvoice = await this.invoiceService.registerPaymentCash(
-            responseBank,
-            invoice,
-          );
-        }, i * 5000);
-      }
-    } catch (error) {
-      this.logger.error(`checkStatusInvoiceCash `, error);
-    }
-  }
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // async checkStatusInvoiceCash() {
+  //   const invoices = await this.invoiceRepository.findInvoicesCash();
+  //   try {
+  //     for (let i = 0; i < invoices.length; i++) {
+  //       const invoice = invoices[i];
+  //       setTimeout(async () => {
+  //         const responseBank = await getStatusInvoicePaymentWs(
+  //           invoice.id.toString(),
+  //         );
+  //         const registerInvoice = await this.invoiceService.registerPaymentCash(
+  //           responseBank,
+  //           invoice,
+  //         );
+  //       }, i * 5000);
+  //     }
+  //   } catch (error) {
+  //     this.logger.error(`checkStatusInvoiceCash `, error);
+  //   }
+  // }
 }
