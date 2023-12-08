@@ -11,7 +11,6 @@ import config from './config/config';
 import { getEnvirontment } from './config/environments';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { TasksService } from './services/tasks.service';
-import { PREFIX } from './main';
 
 @Module({
   imports: [
@@ -35,7 +34,7 @@ import { PREFIX } from './main';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'assets'),
-      serveRoot: `${PREFIX}/assets/`,
+      serveRoot: `${process.env.GLOBAL_PEFIX}/assets/`,
     }),
     ScheduleModule.forRoot(),
     InvoiceModule,
