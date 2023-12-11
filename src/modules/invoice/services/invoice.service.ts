@@ -426,10 +426,7 @@ export class InvoiceService {
       contentType: 'application/pdf',
     };
     const mailOptions: ISendMailOptions = {
-      to:
-        process.env.NODE_ENV != 'pro'
-          ? process.env.EMAIL_TEST
-          : info_cliente.email_persona,
+      to: process.env.NODE_ENV != 'pro' ? process.env.EMAIL_TEST : person.email,
       subject: 'Recibo de pago - Pago exitoso',
       text: messageEmailPaymentOk(
         person,
