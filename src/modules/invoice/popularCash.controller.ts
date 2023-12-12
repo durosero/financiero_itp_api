@@ -77,7 +77,9 @@ export class PopularCashController {
       invoice,
     );
 
-    this.invoiceSysService.registerInvoiceSysApolo(invoice.id);
+    this.invoiceSysService
+      .registerInvoiceSysApolo(invoice.id)
+      .catch(console.log);
 
     return res.send();
   }

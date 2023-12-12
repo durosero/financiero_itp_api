@@ -84,7 +84,9 @@ export class InvoiceService {
         infoMatricula?.cod_periodo,
       );
 
-      this.invoiceSysService.registerInvoiceSysApolo(payload.invoiceId);
+      this.invoiceSysService
+        .registerInvoiceSysApolo(payload.invoiceId)
+        .catch(console.log);
 
       try {
         await this.registerDiscuountInvoice(payload.invoiceId, discounts);
@@ -109,17 +111,19 @@ export class InvoiceService {
           attachments: [attachment],
         };
 
-        this.mailerService
-          .sendMail(mailOptions)
-          .then(() => {
-            this.invoiceRepository.updateStatusEmailSend(
-              EEmailStatus.ENVIADO,
-              searchData.invoiceId,
-            );
-          })
-          .catch((error) => {
-            console.log('No se ha podido enviar el recibo de pago: ', error);
-          });
+        if (invoice.emailSend != EEmailStatus.ENVIADO) {
+          this.mailerService
+            .sendMail(mailOptions)
+            .then(() => {
+              this.invoiceRepository.updateStatusEmailSend(
+                EEmailStatus.ENVIADO,
+                searchData.invoiceId,
+              );
+            })
+            .catch((error) => {
+              console.log('No se ha podido enviar el recibo de pago: ', error);
+            });
+        }
       } catch (error) {
         console.log('No se ha podido registrar los descuentos: ', error);
       }
@@ -397,11 +401,20 @@ export class InvoiceService {
     }
   }
 
-  async sendPaymentEmail(invoiceId: number): Promise<SentMessageInfo> {
+  async sendPaymentEmail(
+    invoiceId: number,
+    important: boolean = false,
+  ): Promise<SentMessageInfo> {
     const invoice = await this.invoiceRepository.findOneForEmail(invoiceId);
 
     if (!invoice)
       throw new NotFoundError(`No se encontro la factura con id ${invoiceId}`);
+
+    if (invoice.emailSend == EEmailStatus.ENVIADO && !important) {
+      throw new NotFoundError(
+        `La factura ${invoiceId} ya fue enviada a: ${invoice.person.email}`,
+      );
+    }
 
     const {
       person,
@@ -438,10 +451,9 @@ export class InvoiceService {
 
     const sendInfo = await this.mailerService.sendMail(mailOptions);
 
-    this.invoiceRepository.updateStatusEmailSend(
-      EEmailStatus.ENVIADO,
-      invoiceId,
-    );
+    this.invoiceRepository
+      .updateStatusEmailSend(EEmailStatus.ENVIADO, invoiceId)
+      .catch(console.log);
 
     return sendInfo;
   }

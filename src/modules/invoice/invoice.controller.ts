@@ -15,6 +15,7 @@ import { GenerateInvoiceService } from './services/generateInvoice.service';
 import { isOnlinePay } from '../../utils/invoice.util';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
+import { SendPaymentDto } from './dto/send-payment.dto';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -40,12 +41,17 @@ export class InvoiceController {
 
   @Get('register/sysapolo/:id')
   async registerInvoiceSysApolo(@Param('id', ParseIntPipe) invoiceId: number) {
-    return this.sysApoloService.registerInvoiceSysApolo(invoiceId);
+    return this.sysApoloService
+      .registerInvoiceSysApolo(invoiceId)
+      .catch(console.log);
   }
 
-  @Get('send/payment/:id')
-  async sendPaymentEmail(@Param('id', ParseIntPipe) invoiceId: number) {
-    return this.invoiceService.sendPaymentEmail(invoiceId);
+  @Post('send/payment/:id')
+  async sendPaymentEmail(
+    @Param('id', ParseIntPipe) invoiceId: number,
+    @Body() payload: SendPaymentDto,
+  ) {
+    return this.invoiceService.sendPaymentEmail(invoiceId, payload.important);
   }
 
   @Get('info/:id')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { isEmpty } from 'lodash';
 import * as moment from 'moment';
 import { NotFoundError } from '../../../classes/httpError/notFounError';
@@ -59,7 +59,8 @@ export class InvoiceSysService {
     const queryRunner = dataSource.createQueryRunner();
     try {
       const invoice = await this.invoiceRepository.findById(invoiceIdParam);
-      if (!invoice) throw new NotFoundError('Factura no encontrada');
+      if (!invoice)
+        throw new NotFoundError(`Factura ${invoiceIdParam} no encontrada`);
 
       const { person, id: invoiceId } = invoice;
       let codTer: string = '00000';
@@ -102,10 +103,19 @@ export class InvoiceSysService {
       );
       return true;
     } catch (error) {
-      console.log(error);
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
-      return false;
+      console.log(error.toString());
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+        await queryRunner.release();
+      }
+
+      throw new HttpException(
+        { ...error, response: error.toString() },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        {
+          cause: error.toString(),
+        },
+      );
     }
   }
 
@@ -166,7 +176,9 @@ export class InvoiceSysService {
     );
 
     if (isEmpty(codInvoiceQuery) || isEmpty(codDetInvoiceQuery))
-      throw new NotFoundError('No se ha podido generar el codigo');
+      throw new NotFoundError(
+        'No se ha podido generar el codigo para crear la factura',
+      );
 
     const dataDescriptiom: IDescriptionSys = {
       category: categoryInvoice.descripcion,
@@ -242,7 +254,9 @@ export class InvoiceSysService {
     );
 
     if (isEmpty(codTerSql))
-      throw new NotFoundError('No se ha podido generar el codigo');
+      throw new NotFoundError(
+        'No se ha podido generar el codigo para crear el tercero',
+      );
 
     const digVer = getVerificationGigit(person.id);
     const codTer: string = codTerSql[0].cod_ter ?? '00000';
