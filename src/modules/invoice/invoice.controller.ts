@@ -41,9 +41,7 @@ export class InvoiceController {
 
   @Get('register/sysapolo/:id')
   async registerInvoiceSysApolo(@Param('id', ParseIntPipe) invoiceId: number) {
-    return this.sysApoloService
-      .registerInvoiceSysApolo(invoiceId)
-      .catch(console.log);
+    return this.sysApoloService.registerInvoiceSysApolo(invoiceId);
   }
 
   @Post('send/payment/:id')
