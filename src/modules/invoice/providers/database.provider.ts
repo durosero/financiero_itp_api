@@ -20,6 +20,11 @@ export const databaseProviders = {
         trustServerCertificate: false,
         encrypt: false,
       },
+      pool: {
+        max: 20,
+        min: 0,
+        idleTimeoutMillis: 30000,
+      },
       synchronize: false,
       logging: 'all',
     });
