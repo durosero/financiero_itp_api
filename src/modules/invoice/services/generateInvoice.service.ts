@@ -75,6 +75,7 @@ export class GenerateInvoiceService {
     if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
 
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
     const [infoMatricula] = !matriculaId
       ? await queryRunner.manager.query<IEnrollment[]>(INFO_PROGRAMA_SQL, [
@@ -84,6 +85,8 @@ export class GenerateInvoiceService {
       : await queryRunner.manager.query<IEnrollment[]>(INFO_MATRICULA_SQL, [
           matriculaId,
         ]);
+
+    await queryRunner.release();
 
     if (!infoMatricula)
       throw new NotFoundError('No se encontro el programa o la matricula');

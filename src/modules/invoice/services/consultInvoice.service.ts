@@ -223,6 +223,7 @@ export class ConsultInvoiceService {
     params: IGenerateInvoice,
   ): Promise<Invoice> {
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
     const [infoMatricula] = await queryRunner.manager.query<IEnrollment[]>(
       INFO_MATRICULA_SQL,
@@ -273,6 +274,8 @@ export class ConsultInvoiceService {
       info_cliente: params.infoEstudiante,
     };
 
+    await queryRunner.release();
+
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
@@ -295,6 +298,7 @@ export class ConsultInvoiceService {
 
   async generateInvoiceEnrrolment(params: IGenerateInvoice): Promise<Invoice> {
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
     const [infoMatricula] = await queryRunner.manager.query<IEnrollment[]>(
       INFO_MATRICULA_SQL,
@@ -365,12 +369,13 @@ export class ConsultInvoiceService {
         aumentoExtra,
         descuentoExtra,
         quantity,
-        categoriaId
+        categoriaId,
       }),
     );
     const infoClient: IInfoInvoice = {
       info_cliente: params.infoEstudiante,
     };
+    await queryRunner.release();
 
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
