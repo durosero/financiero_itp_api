@@ -1,4 +1,6 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   Index,
@@ -78,6 +80,17 @@ export class Invoice {
 
   @Column({ name: 'fecha_update', nullable: true })
   fechaUpdate: Date | null;
+
+  @BeforeInsert()
+  updateDateCreation() {
+    const currentDate = new Date();
+    this.fechaUpdate = currentDate;
+  }
+
+  @BeforeUpdate()
+  updateDateUpdate() {
+    this.fechaUpdate = new Date();
+  }
 
   @Column({ name: 'fecha_limite', nullable: true })
   fechaLimite: Date | null;

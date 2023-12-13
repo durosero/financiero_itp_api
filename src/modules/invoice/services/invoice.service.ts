@@ -157,7 +157,7 @@ export class InvoiceService {
       const invoice: DeepPartial<Invoice> = {
         estadoId: EStatusInvoice.PAGO_FINALIZADO_OK,
         fechaUpdate: new Date(),
-        isOnline: EOnlinePayment.NO,
+        isOnline: EOnlinePayment.NO, //TODO: if is payment online then refactor
       };
 
       await queryRunner.manager.insert(DetailPayment, payment);
