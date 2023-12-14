@@ -3,7 +3,8 @@ import { IPaymentSearch } from '../../../interfaces/payment.interface';
 import { Repository } from 'typeorm';
 
 import { DetailPayment } from '../entities/detailPayment.entity';
-import { EStatusInvoice } from '../enums/invoice.enum';
+import { EEmailStatus, EStatusInvoice } from '../enums/invoice.enum';
+import * as moment from 'moment';
 
 export class DetailPaymentRepository extends Repository<DetailPayment> {
   constructor(
@@ -41,5 +42,32 @@ export class DetailPaymentRepository extends Repository<DetailPayment> {
         estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
       })
       .getOne();
+  }
+
+  findPaymentsOkByDate(date: Date = new Date(), limit: number = 20) {
+    return this.repository
+      .createQueryBuilder('pm')
+      .select('pm')
+      .addSelect([
+        'inv.id',
+        'inv.estudianteId',
+        'inv.isOnline',
+        'inv.sysapoloVerify',
+        'inv.emailSend',
+        'inv.fecha',
+      ])
+      .innerJoin('pm.invoice', 'inv')
+      .innerJoinAndSelect('inv.person', 'per')
+      .where('pm.estadoPagoId = :estadoPago', {
+        estadoPago: EStatusInvoice.PAGO_FINALIZADO_OK,
+      })
+      .andWhere('DATE(pm.fecha) = :date', {
+        date: moment(date).format('YYYY-MM-DD'),
+      })
+      .andWhere('inv.emailSend = :sendMail', {
+        sendMail: EEmailStatus.PENDIENTE,
+      })
+      .limit(limit)
+      .getMany();
   }
 }

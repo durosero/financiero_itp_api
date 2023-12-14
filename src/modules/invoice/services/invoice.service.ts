@@ -115,10 +115,12 @@ export class InvoiceService {
           this.mailerService
             .sendMail(mailOptions)
             .then(() => {
-              this.invoiceRepository.updateStatusEmailSend(
-                EEmailStatus.ENVIADO,
-                searchData.invoiceId,
-              );
+              this.invoiceRepository
+                .updateStatusEmailSend(
+                  EEmailStatus.ENVIADO,
+                  searchData.invoiceId,
+                )
+                .catch(console.log);
             })
             .catch((error) => {
               console.log('No se ha podido enviar el recibo de pago: ', error);

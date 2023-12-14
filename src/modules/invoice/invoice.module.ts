@@ -49,7 +49,7 @@ import { InvoiceSysService } from './services/invoiceSys.service';
     ConfigRepository,
     DiscountRepository,
   ],
-  exports: [InvoiceRepository, InvoiceSysService, InvoiceService],
+  exports: [InvoiceRepository, InvoiceSysService, InvoiceService, DetailPaymentRepository],
   imports: [
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
