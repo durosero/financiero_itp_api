@@ -229,6 +229,8 @@ export class ConsultInvoiceService {
       INFO_MATRICULA_SQL,
       [params.matriculaId],
     );
+    await queryRunner.release();
+
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 
     const config = await this.configRepository.getCurrentConfig();
@@ -274,8 +276,6 @@ export class ConsultInvoiceService {
       info_cliente: params.infoEstudiante,
     };
 
-    await queryRunner.release();
-
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
@@ -304,6 +304,9 @@ export class ConsultInvoiceService {
       INFO_MATRICULA_SQL,
       [params.matriculaId],
     );
+
+    await queryRunner.release();
+
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 
     const config = await this.configRepository.getCurrentConfig();
@@ -375,7 +378,6 @@ export class ConsultInvoiceService {
     const infoClient: IInfoInvoice = {
       info_cliente: params.infoEstudiante,
     };
-    await queryRunner.release();
 
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
     return this.invoiceRepository.create({
