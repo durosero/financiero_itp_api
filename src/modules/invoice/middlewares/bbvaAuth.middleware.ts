@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
@@ -12,7 +13,10 @@ import * as moment from 'moment';
 
 @Injectable()
 export class BbvaAuthMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(BbvaAuthMiddleware.name);
   use(req: Request, res: Response, next: NextFunction) {
+    const { headers, body, method, url } = req;
+    this.logger.debug({ headers, body, method, url });
     const idComercio = Number(process.env.BBVA_ID_COMERCIO) || 0;
     const password = process.env.BBVA_PASS || '';
 

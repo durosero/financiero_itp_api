@@ -20,6 +20,7 @@ import { Package } from './entities/package.entity';
 import { PackageConfiguration } from './entities/packageConfiguration.entity';
 import { PackageDetail } from './entities/packageDetail.entity';
 import { Person } from './entities/person.entity';
+import { RequestLog } from './entities/requestLog.entity';
 import { StatusPayment } from './entities/statusPayment.entity';
 import { UniversityPeriod } from './entities/univsityPeriod.entity';
 import { InvoiceController } from './invoice.controller';
@@ -35,6 +36,7 @@ import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { GenerateInvoiceService } from './services/generateInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
+import { RequestLogService } from './services/requestLog.service';
 
 @Module({
   controllers: [InvoiceController, PopularCashController, BbvaCashController],
@@ -48,6 +50,7 @@ import { InvoiceSysService } from './services/invoiceSys.service';
     PackageRepository,
     ConfigRepository,
     DiscountRepository,
+    RequestLogService
   ],
   exports: [InvoiceRepository, InvoiceSysService, InvoiceService, DetailPaymentRepository],
   imports: [
@@ -69,7 +72,8 @@ import { InvoiceSysService } from './services/invoiceSys.service';
       Discounts,
       DiscountCategory,
       UniversityPeriod,
-      InvoiceDiscounts
+      InvoiceDiscounts, 
+      RequestLog
     ]),
 
     MailerModule.forRootAsync({

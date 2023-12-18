@@ -28,3 +28,18 @@ export enum EResponseDescription {
   WARNING = 'Factura no disponible para pago',
   ERROR = 'Ocurrió́ un error inesperado en la operación',
 }
+
+export enum EStatusLog {
+  OK = '1',
+  ERROR = '0',
+}
+
+export interface IRequestLog {
+  bodyRequest: object;
+  headerRequest?: object;
+  bodyResponse: object;
+  headerResponse?: object;
+  statusCode?: number,
+  host: string;
+  urlServide: string;
+}

@@ -6,6 +6,8 @@ import {
   Post,
   Req,
   Request,
+  UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import * as moment from 'moment';
 import {
@@ -27,6 +29,8 @@ import {
   ESeverityCode,
   EStatusInvoice,
 } from './enums/invoice.enum';
+import { RequesLogtInterceptor } from './interceptors/requestLog.interceptor';
+
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceService } from './services/invoice.service';
@@ -41,14 +45,10 @@ export class BbvaCashController {
 
   private readonly logger = new Logger('BBVA-ENDPOINT');
 
+  @UseInterceptors(RequesLogtInterceptor)
   @Post('/consultarfactura')
   @HttpCode(200)
-  async consultarFactura(
-    @Body() payload: BbvaConsultInvoiceDto,
-    @Req() { headers, body, method, url }: Request,
-  ) {
-    this.logger.debug({ headers, body, method, url });
-
+  async consultarFactura(@Body() payload: BbvaConsultInvoiceDto) {
     try {
       const invoice = await this.consultInvoiceService.searchInvoiceForPayment(
         Number(payload.Referencia_pago),
@@ -73,11 +73,7 @@ export class BbvaCashController {
   }
 
   @Post('/reversarpagos')
-  async reversarFactura(
-    @Body() payload: BbvaReversePaymentDto,
-    @Req() { headers, body, method, url }: Request,
-  ) {
-    this.logger.debug({ headers, body, method, url });
+  async reversarFactura(@Body() payload: BbvaReversePaymentDto) {
     try {
       const payloadReverse: ReversePaymentDto = {
         codigo_transaccion: payload.Id_transaccion,
@@ -104,12 +100,7 @@ export class BbvaCashController {
   }
 
   @Post('/registrarpagos')
-  async registrarFactura(
-    @Body() payload: BbvaRegisterPaymentDto,
-    @Req() { headers, body, method, url }: Request,
-  ) {
-    this.logger.debug({ headers, body, method, url });
-
+  async registrarFactura(@Body() payload: BbvaRegisterPaymentDto) {
     try {
       const invoice = await this.invoiceRepository.findById(
         Number(payload.Referencia_pago),
