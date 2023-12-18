@@ -72,6 +72,7 @@ export class BbvaCashController {
     }
   }
 
+  @UseInterceptors(RequesLogtInterceptor)
   @Post('/reversarpagos')
   async reversarFactura(@Body() payload: BbvaReversePaymentDto) {
     try {
@@ -99,6 +100,7 @@ export class BbvaCashController {
     }
   }
 
+  @UseInterceptors(RequesLogtInterceptor)
   @Post('/registrarpagos')
   async registrarFactura(@Body() payload: BbvaRegisterPaymentDto) {
     try {
