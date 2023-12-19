@@ -6,30 +6,29 @@ export class RequestLog {
   id: number;
 
   @Column('tinytext', { name: 'url_service', nullable: false })
-  urlService: string;
+  urlService: string | null;
 
-  @Column('tinytext', { name: 'json_body', nullable: true })
-  jsonJody: string | null;
+  @Column('tinytext', { name: 'body_request', nullable: true })
+  bodyRequest: string | null;
 
-  @Column('longtext', { name: 'json_response', nullable: false })
-  jsonResponse: string | null;
+  @Column('longtext', { name: 'body_response', nullable: false })
+  bodyResponse: string | null;
 
-  @Column({
-    name: 'estado',
-    nullable: true,
-    length: 1,
-    type: 'char',
-    enum: EStatusLog,
-    default: EStatusLog.OK,
-  })
-  estado: EStatusLog | null;
+  @Column('longtext', { name: 'header_request', nullable: false })
+  headerRequest: string | null;
+
+  @Column('integer', { name: 'status_code', nullable: true })
+  statusCode: number | null;
 
   @Column('tinytext', { name: 'message', nullable: true })
   message: string | null;
 
-  @Column('varchar', { name: 'host', nullable: true })
-  host: string | null;
+  @Column('varchar', { name: 'client_ip', nullable: true })
+  clientIp: string | null;
 
-  @Column('timestamp', { name: 'fecha', nullable: true })
-  fecha: Date;
+  @Column('varchar', { name: 'invoice_id', nullable: true })
+  invoiceId: number | null;
+
+  @Column('timestamp', { name: 'created_at', nullable: true })
+  createdAt: Date;
 }

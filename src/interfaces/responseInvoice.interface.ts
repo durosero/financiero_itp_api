@@ -35,11 +35,12 @@ export enum EStatusLog {
 }
 
 export interface IRequestLog {
-  bodyRequest: object;
-  headerRequest?: object;
-  bodyResponse: object;
-  headerResponse?: object;
-  statusCode?: number,
-  host: string;
-  urlServide: string;
+  bodyRequest: object | null;
+  headerRequest?: object | null;
+  bodyResponse?: object | null;
+  headerResponse?: object | null;
+  statusCode?: number | null;
+  invoiceId?: number | null;
+  urlService: string | null;
+  clientIp: string | null;
 }

@@ -17,7 +17,7 @@ export class RequesLogtInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const { body, url, hostname } = context.switchToHttp().getRequest();
+    const { body, url, headers } = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
@@ -25,8 +25,10 @@ export class RequesLogtInterceptor implements NestInterceptor {
         const payload: IRequestLog = {
           bodyRequest: body,
           bodyResponse: responseBody,
-          host: hostname,
-          urlServide: `${process.env.BASE_URL}${url}`,
+          clientIp: headers['x-forwarded-for'] || headers['x-real-ip'],
+          headerRequest: headers,
+          invoiceId: body?.Referencia_pago,
+          urlService: `${process.env.BASE_URL}${url}`,
           statusCode: response.statusCode ?? 0,
         };
 

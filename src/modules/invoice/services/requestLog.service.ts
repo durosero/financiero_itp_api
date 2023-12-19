@@ -15,19 +15,15 @@ export class RequestLogService {
   ) {}
 
   async saveLog(payload: IRequestLog) {
-    const status = [200, 201, 202, 203, 204, 205, 206, 207, 208, 226].includes(
-      payload.statusCode,
-    )
-      ? EStatusLog.OK
-      : EStatusLog.ERROR;
-
     const requestLog = this.requestLogsRepository.create({
-      estado: status,
-      host: payload.host,
-      jsonJody: JSON.stringify(payload.bodyRequest),
-      jsonResponse: JSON.stringify(payload.bodyResponse),
-      urlService: payload.urlServide,
-      fecha: new Date(),
+      urlService: payload.urlService,
+      bodyRequest: JSON.stringify(payload.bodyRequest),
+      bodyResponse: JSON.stringify(payload.bodyResponse),
+      headerRequest: JSON.stringify(payload.headerRequest),
+      statusCode: payload.statusCode,
+      clientIp: payload.clientIp,
+      invoiceId: payload.invoiceId,
+      createdAt: new Date(),
     });
 
     return this.requestLogsRepository.save(requestLog);
