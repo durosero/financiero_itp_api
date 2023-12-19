@@ -134,7 +134,7 @@
             </tr>
             <tr>
                 <td>
-                    Periodo: {{matricula.nom_periodo}}</td>
+                    Periodo: {{infoStudent.nom_periodo}}</td>
                 <td rowspan="4" style="vertical-align: bottom;">
 
                 </td>
@@ -159,7 +159,7 @@
         <table style="width: 100%; font-size: 10px; border-collapse: collapse;" class="table-border" cellpadding="0"
             cellspacing="0">
             <tr>
-                <td colspan="2">Sede: {{ infoStudent.siglas_colegio }}</td>
+                <td colspan="2">Sede: {{ infoStudent.siglas_colegio }} - {{ infoStudent.siglas_colegio }}</td>
                 <th rowspan="2" style="color: black;">REF: {{id}}</th>
                 <td rowspan="11"
                     style="border: 0px !important; padding-left: 8px; font-size: 12px; vertical-align: bottom; ">
@@ -217,6 +217,9 @@
                         src="{{BASE_URL}}/assets/logos/bancopopular.png" />
                     <img class="img img-fluid" alt="" style="height: 30px;"
                         src="{{BASE_URL}}/assets/logos/efecty.png" />
+                    &nbsp;
+                    <img class="img img-fluid" alt="" style="height: 23px; margin: 2px;"
+                        src="{{BASE_URL}}/assets/logos/su-red.png" />
                     &nbsp; --}}
                     <img class="img img-fluid" alt="" style="height: 30px;"
                         src="{{BASE_URL}}/assets/logos/supergiros.png" />
