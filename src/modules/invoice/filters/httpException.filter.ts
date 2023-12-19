@@ -30,13 +30,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
     };
 
-    const header = request.headers;
-    header.forwarded;
+    const headers: any = request.headers;
 
     const payload: IRequestLog = {
       bodyRequest: request.body,
       bodyResponse,
-      clientIp: request.ip || request.headers.forwarded,
+      clientIp: headers['x-forwarded-for'] || headers['x-real-ip'],
       headerRequest: request.headers,
       invoiceId: request?.body?.Referencia_pago,
       urlService: `${process.env.BASE_URL}${request.url}`,
