@@ -21,11 +21,11 @@ export class TasksService {
   }
   private readonly logger = new Logger(TasksService.name);
 
-  @Cron(CronExpression.EVERY_DAY_AT_3AM)
-  async deleteUnpaidInvoices() {
-    const deleteInvoices = await this.invoiceRepository.deleteInvoices();
-    this.logger.debug('The following invoices was removed', deleteInvoices);
-  }
+  // @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  // async deleteUnpaidInvoices() {
+  //   const deleteInvoices = await this.invoiceRepository.deleteInvoices();
+  //   this.logger.debug('The following invoices was removed', deleteInvoices);
+  // }
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   async sendPendingPaymentsToEmail() {

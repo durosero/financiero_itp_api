@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, In, Repository } from 'typeorm';
 import { Invoice } from '../entities/invoice.entity';
 import {
+  ECategoryInvoice,
   EEmailStatus,
   EOnlinePayment,
   EStatusInvoice,
@@ -171,6 +172,13 @@ export class InvoiceRepository extends Repository<Invoice> {
     clientId: string,
     categoryId: number,
   ): Promise<Invoice> {
+    if (
+      categoryId != ECategoryInvoice.MATRICULA &&
+      categoryId != ECategoryInvoice.INSCRIPCION
+    ) {
+      return undefined;
+    }
+
     const result = await this.repository
       .createQueryBuilder('inv')
       .select('inv')

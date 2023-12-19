@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Request,
+  UseFilters,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
@@ -29,12 +30,14 @@ import {
   ESeverityCode,
   EStatusInvoice,
 } from './enums/invoice.enum';
+import { HttpExceptionFilter } from './filters/httpException.filter';
 import { RequesLogtInterceptor } from './interceptors/requestLog.interceptor';
 
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 
+@UseFilters(HttpExceptionFilter)
 @Controller('caja/bbva')
 export class BbvaCashController {
   constructor(
