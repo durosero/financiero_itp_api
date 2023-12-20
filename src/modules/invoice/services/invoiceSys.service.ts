@@ -73,10 +73,9 @@ export class InvoiceSysService {
       await queryRunner.startTransaction();
 
       if (invoiceSys) {
-        this.invoiceRepository.updateStatusVerifySys(
-          ESysApoloStatus.REGISTRADO,
-          invoiceId,
-        );
+        this.invoiceRepository
+          .updateStatusVerifySys(ESysApoloStatus.REGISTRADO, invoiceId)
+          .catch(console.log);
         throw new UnprocessableEntity(
           `La factura ${invoiceId} ya se encuentra en sysApolo`,
         );
@@ -97,10 +96,9 @@ export class InvoiceSysService {
 
       await queryRunner.commitTransaction();
       await queryRunner.release();
-      this.invoiceRepository.updateStatusVerifySys(
-        ESysApoloStatus.REGISTRADO,
-        invoiceId,
-      );
+      this.invoiceRepository
+        .updateStatusVerifySys(ESysApoloStatus.REGISTRADO, invoiceId)
+        .catch(console.log);
       return true;
     } catch (error) {
       console.log(error.toString());
@@ -130,8 +128,8 @@ export class InvoiceSysService {
       nomTercero: fullName.trim(),
       priApellido: apellido1,
       segApellido: apellido2 ?? '',
-      priNombre: nombre1,
-      otrNombre: nombre2 ?? '',
+      priNombre: nombre1.split(' ')[0] ?? '',
+      otrNombre: nombre2.split(' ')[0] ?? '',
       dirTercero: person.direccion,
       telTercero: person.phone,
       ideMun: person.codMunicipio,
@@ -147,6 +145,9 @@ export class InvoiceSysService {
 
   async createInvoiceSys(dbSys: QueryRunner, invoice: Invoice, codTer: string) {
     const { jsonResponse, categoryInvoice, detailInvoices } = invoice;
+    if (!jsonResponse)
+      throw new NotFoundError('Falta información de matricula en la factura ');
+
     const { info_cliente: infoStudet }: IInfoInvoice = JSON.parse(jsonResponse);
 
     const payment = await this.detailPaymentRepository.findPaymentOkByInvoiceId(
@@ -249,6 +250,9 @@ export class InvoiceSysService {
   ): Promise<string> {
     const { documentType, apellido1, apellido2, nombre1, nombre2 } = person;
 
+    if (nombre2.length > 15) {
+    }
+
     const codTerSql = await this.thirdPartySysRepository?.query(
       COD_TERCERO_SQL,
     );
@@ -275,8 +279,8 @@ export class InvoiceSysService {
       nomTercero: fullName.trim(),
       priApellido: apellido1,
       segApellido: apellido2 ?? '',
-      priNombre: nombre1,
-      otrNombre: nombre2 ?? '',
+      priNombre: nombre1.split(' ')[0] ?? '',
+      otrNombre: nombre2.split(' ')[0] ?? '',
       claTercero: 'S',
       dirTercero: person.direccion,
       telTercero: person.phone,
