@@ -19,7 +19,14 @@ export interface IInvicePdfParams {
   barcodeExt?: string;
   infoStudent: IStudent;
   discounts?: Discounts[];
-  period?: UniversityPeriod;
+  period?: {
+    fecIniInsNuevos: Date;
+    fecFinInsNuevos: Date;
+    fechaInicioMatricula: Date;
+    fechaFinMatricula: Date;
+    fechaInicioMatriculaExt: Date;
+    fechaFinMatriculaExt: Date;
+  };
   totalOrdinario: number;
   totalExtraordinario?: number;
   qrBase64?: string;

@@ -12,7 +12,6 @@ import {
 import { createDetailInvoice } from '../../../utils/adapters/invoiceAdapter.util';
 import {
   calcularTotales,
-  calcularTotalExtraOrdinario,
   generateCodeInvoice,
   generateEndDatePayment,
   isOnlinePay,
@@ -34,6 +33,7 @@ import { ConfigRepository } from '../repositories/config.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { PackageRepository } from '../repositories/package.repository';
+import { EnrollmentService } from './enrollment.service';
 
 @Injectable()
 export class ConsultInvoiceService {
@@ -49,6 +49,8 @@ export class ConsultInvoiceService {
 
     @InjectRepository(UniversityPeriod)
     private periodRepository: Repository<UniversityPeriod>,
+
+    private enrollmentService: EnrollmentService,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -331,24 +333,15 @@ export class ConsultInvoiceService {
 
     const { packageDetail, categoriaId } = packageInvoce;
 
-    const [period, discounts] = await Promise.all([
-      this.periodRepository.findOne({
-        where: {
-          codPeriodo: infoMatricula.cod_periodo,
-          codColegio: infoMatricula.cod_colegio,
-        },
-      }),
-
+    const [discounts, studentType] = await Promise.all([
       this.discountRepository.findForEnrollment(
         categoriaId,
         infoMatricula.ide_persona,
         infoMatricula.cod_periodo,
       ),
+      this.enrollmentService.generateStudentTypeByEnrollment(infoMatricula),
     ]);
 
-    if (!period) throw new NotFoundError('No se encontro el periodo academico');
-
-    const { fecFinMatextraord, fecFinMatOrdinaria } = period;
     const currenDate = new Date();
 
     let aumentoExtra: number = discounts
@@ -360,8 +353,8 @@ export class ConsultInvoiceService {
       .reduce((a, b) => a + b.porcentaje, 0);
 
     if (
-      currenDate.getTime() >= fecFinMatextraord.getTime() &&
-      !isNull(fecFinMatextraord)
+      currenDate.getTime() > studentType.fechaFinMatricula.getTime() &&
+      !isNull(studentType.fechaFinMatricula)
     ) {
       aumentoExtra = aumentoExtra + config.porcentajeExt;
     }
@@ -389,7 +382,7 @@ export class ConsultInvoiceService {
       periodoId: infoMatricula.cod_periodo,
       jsonResponse: JSON.stringify(infoClient),
       codPaquete,
-      fechaLimite: fecFinMatextraord ?? fecFinMatOrdinaria,
+      fechaLimite: studentType.fechaFinMatriculaExt,
       isOnline: params.isPagoOnline ? EOnlinePayment.SI : EOnlinePayment.NO,
       categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),

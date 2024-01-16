@@ -38,6 +38,7 @@ import { DiscountRepository } from '../repositories/discount.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { PackageRepository } from '../repositories/package.repository';
 import { ConsultInvoiceService } from './consultInvoice.service';
+import { EnrollmentService } from './enrollment.service';
 
 @Injectable()
 export class GenerateInvoiceService {
@@ -55,7 +56,7 @@ export class GenerateInvoiceService {
     private readonly dataSource: DataSource,
 
     private discountRepository: DiscountRepository,
-    private configRepository: ConfigRepository,
+    private enrollmentService: EnrollmentService,
   ) {}
 
   async mainGenerateInvoice(payload: GenerateInvoiceDto) {
@@ -149,21 +150,15 @@ export class GenerateInvoiceService {
       packageInvoce,
     );
 
-    const [period, discounts] = await Promise.all([
-      this.periodRepository.findOne({
-        where: {
-          codPeriodo: info_cliente.cod_periodo,
-          codColegio: info_cliente.cod_colegio,
-        },
-      }),
+    const [discounts, studentType] = await Promise.all([
       this.discountRepository.findForEnrollment(
         categoryInvoice.id,
         info_cliente.ide_persona,
         info_cliente.cod_periodo,
       ),
-    ]);
 
-    if (!period) throw new NotFoundError('No se encontro el periodo academico');
+      this.enrollmentService.generateStudentTypeByEnrollment(info_cliente),
+    ]);
 
     invoice.detailInvoices = llenarSubTotal(detailInvoices);
 
@@ -177,12 +172,12 @@ export class GenerateInvoiceService {
       invoice.detailInvoices = llenarSubTotalSinAumento(detailInvoices);
 
       const barcodeOrd = generarCodigoBarras({
-        limitDate: period.fecFinMatOrdinaria,
+        limitDate: studentType?.fechaFinMatricula,
         reference: invoice.id.toString(),
         value: totalOrdinario,
       });
       const barcodeExtra = generarCodigoBarras({
-        limitDate: period.fecFinMatextraord,
+        limitDate: studentType.fechaFinMatriculaExt,
         reference: invoice.id.toString(),
         value: totalExtraordinario,
       });
@@ -195,7 +190,7 @@ export class GenerateInvoiceService {
         discounts,
         totalOrdinario,
         totalExtraordinario,
-        period,
+        period: studentType,
         qrBase64,
         generated: new Date(),
         BASE_URL: getBaseUrl(),
@@ -211,7 +206,7 @@ export class GenerateInvoiceService {
 
     if (invoice.categoriaPagoId == ECategoryInvoice.INSCRIPCION) {
       const barcodeOrd = generarCodigoBarras({
-        limitDate: period.fecFinInsNuevos ?? generateEndDatePayment(),
+        limitDate: studentType.fecFinInsNuevos ?? generateEndDatePayment(),
         reference: invoice.id.toString(),
         value: totalOrdinario,
       });
@@ -222,7 +217,7 @@ export class GenerateInvoiceService {
         infoStudent: info_cliente,
         discounts,
         totalOrdinario,
-        period,
+        period: studentType,
         qrBase64,
         generated: new Date(),
         BASE_URL: getBaseUrl(),

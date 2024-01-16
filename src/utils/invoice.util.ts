@@ -21,8 +21,7 @@ export const generateDescriptionSys = (payload: IDescriptionSys): string => {
 
 //esto solo puede funcionar si el aumento solo corresponde a la matricula extraordinaria
 export const calcularTotales = (
-  detalle: DetailInvoice[],
-  porcentajeExt: number = 0.1,
+  detalle: DetailInvoice[]
 ): ITotales => {
   const totalExtraordinario = detalle
     .map(({ valorUnidad, cantidad, aumento, descuento }) => {

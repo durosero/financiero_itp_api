@@ -107,3 +107,61 @@ col_matricula.cod_matricula
     WHERE col_persona.ide_persona=?
     AND tec_programa_persona.id_programa_persona=?
     GROUP BY tec_institucion_programa.cod_colegio_programa`;
+
+export const ASIGNATURAS_REGISTRADAS = `SELECT
+tec_programa_persona.id_programa_persona ,
+col_colegio_asignatura.cod_colegio_asignatura,
+tec_programa_persona.ide_persona,
+tec_programa_persona.cod_planestudios,
+col_matricula.cod_curso,
+col_matricula.cod_matricula,
+col_asignatura.cod_asignatura,
+col_asignatura.nom_asignatura,
+col_colegio_asignatura_matricula.cod_estadomateria,
+col_estadomateria.nom_estadomateria,
+col_matricula.estudiante_nuevo,
+tec_institucion_programa.fechaini_matord,
+tec_institucion_programa.fechafin_matord,
+tec_institucion_programa.mat_ordinaria
+FROM
+tec_programa_persona
+INNER JOIN tec_institucion_programa 
+    ON (tec_programa_persona.cod_colegio_programa = tec_institucion_programa.cod_colegio_programa)
+INNER JOIN col_matricula 
+    ON (col_matricula.id_programa_persona = tec_programa_persona.id_programa_persona)
+INNER JOIN col_colegio_asignatura_matricula 
+    ON (col_colegio_asignatura_matricula.cod_matricula = col_matricula.cod_matricula)
+   inner join col_estadomateria
+   on col_estadomateria.cod_estadomateria=col_colegio_asignatura_matricula.cod_estadomateria
+INNER JOIN col_colegio_asignatura 
+    ON (col_colegio_asignatura_matricula.cod_colegio_asignatura = col_colegio_asignatura.cod_colegio_asignatura)
+INNER JOIN col_asignatura 
+    ON (col_colegio_asignatura.cod_asignatura = col_asignatura.cod_asignatura)
+            where tec_programa_persona.id_programa_persona  =?
+        and col_colegio_asignatura_matricula.cod_estadomateria <> 6`;
+
+export const PENSUM_MATRICULA = `
+SELECT
+tec_programa_persona.id_programa_persona ,
+col_colegio_asignatura.cod_colegio_asignatura,
+tec_programa_persona.ide_persona,
+tec_programa_persona.cod_planestudios,
+col_pensul.cod_curso,
+col_asignatura.cod_asignatura,
+col_asignatura.nom_asignatura
+FROM
+tec_programa_persona
+INNER JOIN tec_plandeestudios 
+    ON (tec_programa_persona.cod_planestudios = tec_plandeestudios.cod_planestudios)
+INNER JOIN tec_institucion_programa 
+    ON (tec_programa_persona.cod_colegio_programa = tec_institucion_programa.cod_colegio_programa)
+INNER JOIN col_pensul 
+    ON (col_pensul.cod_planestudios = tec_plandeestudios.cod_planestudios)
+INNER JOIN col_colegio_asignatura 
+    ON (col_colegio_asignatura.cod_pensum = col_pensul.cod_pensul)
+INNER JOIN col_asignatura 
+    ON (col_colegio_asignatura.cod_asignatura = col_asignatura.cod_asignatura)AND (tec_institucion_programa.cod_colegio = col_colegio_asignatura.cod_colegio)
+    where tec_programa_persona.id_programa_persona  =?
+`;
+
+export const NUMERO_MATRICULAS = ` select count(*) as numero from col_matricula cm WHERE cm.id_programa_persona =? and cm.cod_estadomatricula not in (2,5)`;

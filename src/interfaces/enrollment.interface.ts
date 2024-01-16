@@ -50,3 +50,34 @@ export interface IStudent {
 export interface IInfoInvoice {
   info_cliente: IStudent | IEnrollment;
 }
+
+export interface IPensumSubjects {
+  id_programa_persona: number;
+  cod_colegio_asignatura: number;
+  ide_persona: string;
+  cod_planestudios: number;
+  cod_curso: number;
+  cod_asignatura: number;
+  nom_asignatura: string;
+}
+
+export interface IPensumSubjectsStudent extends IPensumSubjects {
+  cod_matricula: number;
+  cod_estadomateria: number;
+  nom_estadomateria: string;
+  estudiante_nuevo: string;
+  fechaini_matord: Date;
+  fechafin_matord: Date;
+  mat_ordinaria: string;
+}
+
+export interface IStudentType {
+  codigo: number;
+  descripcion: string;
+  fechaInicioMatricula: Date;
+  fechaFinMatricula: Date;
+  fechaInicioMatriculaExt: Date;
+  fechaFinMatriculaExt: Date;
+  fecIniInsNuevos:Date;
+  fecFinInsNuevos:Date;
+}

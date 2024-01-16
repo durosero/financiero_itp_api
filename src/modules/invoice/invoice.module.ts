@@ -33,6 +33,7 @@ import { DiscountRepository } from './repositories/discount.repository';
 import { InvoiceRepository } from './repositories/invoice.repository';
 import { PackageRepository } from './repositories/package.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
+import { EnrollmentService } from './services/enrollment.service';
 import { GenerateInvoiceService } from './services/generateInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
@@ -50,7 +51,8 @@ import { RequestLogService } from './services/requestLog.service';
     PackageRepository,
     ConfigRepository,
     DiscountRepository,
-    RequestLogService
+    RequestLogService,
+    EnrollmentService
   ],
   exports: [InvoiceRepository, InvoiceSysService, InvoiceService, DetailPaymentRepository],
   imports: [

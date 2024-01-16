@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   StreamableFile,
 } from '@nestjs/common';
 import { getBaseUrl } from 'src/config/environments';
@@ -16,6 +17,7 @@ import { isOnlinePay } from '../../utils/invoice.util';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
 import { SendPaymentDto } from './dto/send-payment.dto';
+import { EnrollmentService } from './services/enrollment.service';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -23,6 +25,7 @@ export class InvoiceController {
     private readonly invoiceService: InvoiceService,
     private readonly sysApoloService: InvoiceSysService,
     private readonly generateInvoiceService: GenerateInvoiceService,
+    private readonly enrollmentService: EnrollmentService,
   ) {}
 
   @Get('payment/pdf/:id')
@@ -111,5 +114,10 @@ export class InvoiceController {
   @Header('content-type', 'text/html')
   async generateInvoiceHtml(@Param('id', ParseIntPipe) invoiceId: number) {
     return this.generateInvoiceService.getHtmlInvoice(invoiceId);
+  }
+
+  @Get('studenttype')
+  async getStudentType(@Query('matriculaId') matriculaId: number) {
+    return this.enrollmentService.getDatesStudentType(matriculaId);
   }
 }

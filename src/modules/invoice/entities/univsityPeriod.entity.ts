@@ -102,21 +102,53 @@ export class UniversityPeriod {
   })
   fecFinMatAntiguos: Date | null;
 
-  @Column({
-    name: 'fec_ini_matordinaria',
-    nullable: true,
-    type: 'date',
-    transformer: new ColumnDateTransformer(),
-  })
-  fecIniMatordinaria: Date | null;
+  // @Column({
+  //   name: 'fec_ini_matordinaria',
+  //   nullable: true,
+  //   type: 'date',
+  //   transformer: new ColumnDateTransformer(),
+  // })
+  // fecIniMatordinaria: Date | null;
+
+  // @Column({
+  //   name: 'fec_fin_matordinaria',
+  //   nullable: true,
+  //   type: 'date',
+  //   transformer: new ColumnDateTransformer(),
+  // })
+  // fecFinMatOrdinaria: Date | null;
 
   @Column({
-    name: 'fec_fin_matordinaria',
+    name: 'fec_ini_matordnew',
     nullable: true,
     type: 'date',
     transformer: new ColumnDateTransformer(),
   })
-  fecFinMatOrdinaria: Date | null;
+  fecIniMatordinariaNew: Date | null;
+
+  @Column({
+    name: 'fec_fin_matordnew',
+    nullable: true,
+    type: 'date',
+    transformer: new ColumnDateTransformer(),
+  })
+  fecFinMatOrdinariaNew: Date | null;
+
+  @Column({
+    name: 'fec_ini_matordant',
+    nullable: true,
+    type: 'date',
+    transformer: new ColumnDateTransformer(),
+  })
+  fecIniMatordinariaAnt: Date | null;
+
+  @Column({
+    name: 'fec_fin_matordant',
+    nullable: true,
+    type: 'date',
+    transformer: new ColumnDateTransformer(),
+  })
+  fecFinMatOrdinariaAnt: Date | null;
 
   @Column({
     name: 'fec_ini_matextraord',
