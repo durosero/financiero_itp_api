@@ -84,6 +84,11 @@ export class ConsultInvoiceService {
       categoriaPagoId,
     };
 
+    if (categoriaPagoId !== ECategoryInvoice.MATRICULA) {
+      invoice.valor = total;
+      return invoice;
+    }
+
     const newInvoice = await this.generateInvoiceByParams(params);
 
     if (total == newInvoice.valor) {
