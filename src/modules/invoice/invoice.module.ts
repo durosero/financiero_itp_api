@@ -109,6 +109,10 @@ export class InvoiceModule {
       path: 'caja/reverso',
       method: RequestMethod.POST,
     });
+    consumer.apply(ValidateTokenMiddleware).forRoutes({
+      path: 'caja/registrarpagos',
+      method: RequestMethod.POST,
+    });
     consumer.apply(BbvaAuthMiddleware).forRoutes({
       path: 'caja/bbva/consultarfactura',
       method: RequestMethod.POST,
