@@ -309,4 +309,23 @@ export class InvoiceSysService {
       return false;
     }
   }
+
+  async registerInvoiceMasive() {
+    const invoices = await this.invoiceRepository.getPaidInvoiceLimit(100);
+
+    let success = 0;
+    let fail = 0;
+
+    for (const { id } of invoices) {
+      try {
+        await this.registerInvoiceSysApolo(id);
+        success++;
+      } catch (error) {
+        console.log(error);
+        fail++;
+      }
+    }
+
+    return { success, fail };
+  }
 }

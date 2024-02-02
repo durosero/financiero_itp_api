@@ -48,12 +48,13 @@ export class TasksService {
       this.logger.warn(`start cron job sysAploInvoice`);
       const invoices = await this.invoiceRepository.getPaidInvoiceLimit(50);
       console.log(JSON.stringify(invoices));
-      try {
-        for (const { id } of invoices) {
+
+      for (const { id } of invoices) {
+        try {
           await this.invoiceSysService.registerInvoiceSysApolo(id);
+        } catch (error) {
+          this.logger.warn(error);
         }
-      } catch (error) {
-        this.logger.warn(error);
       }
     });
 

@@ -120,4 +120,9 @@ export class InvoiceController {
   async getStudentType(@Query('matriculaId') matriculaId: number) {
     return this.enrollmentService.getDatesStudentType(matriculaId);
   }
+
+  @Get('sysapolo/send-bulk')
+  async registerSysApoloMasive() {
+    return this.sysApoloService.registerInvoiceMasive();
+  }
 }
