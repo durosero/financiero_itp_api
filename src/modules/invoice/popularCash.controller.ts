@@ -20,6 +20,7 @@ import {
 } from '../../interfaces/responseInvoice.interface';
 import { MESSAGE_RESPONSE_REVERSE } from './constant/invoice.constant';
 import { BbvaRegisterPaymentDto } from './dto/bbva-register-payment';
+import { PopularRegisterPaymentDto } from './dto/popular-register-payment.dto';
 import { ReversePaymentDto } from './dto/reverse-payment.dto';
 import { ValidateInvoiceDto } from './dto/validate-invoice.dto';
 import {
@@ -111,30 +112,30 @@ export class PopularCashController {
     } catch (error) {
       this.logger.warn(error);
       return {
-        Descripcion: MESSAGE_RESPONSE_REVERSE[2],
-        Severidad: ESeverity.ERROR,
-        Codigo_estado: EResposeStatusCode.ERROR,
+        descripcion: MESSAGE_RESPONSE_REVERSE[2],
+        severidad: ESeverity.ERROR,
+        codigo_estado: EResposeStatusCode.ERROR,
       };
     }
   }
 
   @UseInterceptors(RequesLogtInterceptor)
-  @Post('/registrarpagos')
-  async registrarFactura(@Body() payload: BbvaRegisterPaymentDto) {
+  @Post('/registrarpago')
+  async registrarFactura(@Body() payload: PopularRegisterPaymentDto) {
     try {
       const invoice = await this.invoiceRepository.findById(
-        Number(payload.Referencia_pago),
+        Number(payload.referencia_pago),
       );
 
       if (!invoice) throw new NotFoundError('Factura no encontrada');
 
       const payloadRegister: IPaymentRegister = {
-        date: payload.Fecha_pago,
-        invoiceId: Number(payload.Referencia_pago),
+        date: payload.fecha_pago,
+        invoiceId: Number(payload.referencia_pago),
         status: EStatusInvoice.PAGO_FINALIZADO_OK,
-        transactionCode: payload.Id_transaccion,
-        value: payload.Valor_pagado,
-        bankId: payload.Id_Banco,
+        transactionCode: payload.codigo_transaccion,
+        value: payload.valor_pagado,
+        bankId: payload.id_banco,
         name_bank: EBankCash.POPULAR,
       };
 
@@ -145,23 +146,23 @@ export class PopularCashController {
 
       if (success) {
         return {
-          Descripcion: ERegisterDescription.INFORMATIVE,
-          Severidad: ESeverity.INFORMATIVE,
-          Codigo_estado: ESeverityCode.INFORMATIVE,
+          descripcion: ERegisterDescription.INFORMATIVE,
+          severidad: ESeverity.INFORMATIVE,
+          codigo_estado: ESeverityCode.INFORMATIVE,
         };
       }
 
       return {
-        Descripcion: ERegisterDescription.WARNING,
-        Severidad: ESeverity.WARNING,
-        Codigo_estado: ESeverityCode.WARNING,
+        descripcion: ERegisterDescription.WARNING,
+        severidad: ESeverity.WARNING,
+        codigo_estado: ESeverityCode.WARNING,
       };
     } catch (error) {
       this.logger.warn(error);
       return {
-        Descripcion: ERegisterDescription.ERROR,
-        Severidad: ESeverity.ERROR,
-        Codigo_estado: ESeverityCode.ERROR,
+        descripcion: ERegisterDescription.ERROR,
+        severidad: ESeverity.ERROR,
+        codigo_estado: ESeverityCode.ERROR,
       };
     }
   }
