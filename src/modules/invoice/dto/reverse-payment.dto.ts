@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsDate,
@@ -13,6 +14,10 @@ import {
 import * as moment from 'moment';
 
 export class ReversePaymentDto {
+  @ApiProperty({
+    example: 2,
+    required: true,
+  })
   @IsNumber()
   @IsInt()
   @IsPositive()
@@ -22,12 +27,21 @@ export class ReversePaymentDto {
   })
   id_banco: number;
 
+  @ApiProperty({
+    example: '37987',
+    required: true,
+    type: 'string',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(60)
   referencia_pago: number;
 
+  @ApiProperty({
+    example: '01/02/2024 18:34:00',
+    required: true,
+  })
   @IsNotEmpty()
   @Transform(({ value }) => {
     const auxDate = new Date();
@@ -39,6 +53,10 @@ export class ReversePaymentDto {
   })
   fecha_reverso: Date;
 
+  @ApiProperty({
+    example: 408800,
+    required: true,
+  })
   @IsNumber()
   @IsPositive()
   @IsNotEmpty()
@@ -47,6 +65,11 @@ export class ReversePaymentDto {
   })
   valor_pagado: number;
 
+  @ApiProperty({
+    example: 1591681879,
+    required: true,
+    type: 'string',
+  })
   @IsString()
   @MinLength(1)
   @MaxLength(40)

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -10,6 +11,10 @@ import {
 } from 'class-validator';
 
 export class ValidateInvoiceDto {
+  @ApiProperty({
+    example: 2,
+    required: true,
+  })
   @IsNumber()
   @IsNotEmpty()
   @Transform(({ value }) => {
@@ -17,6 +22,10 @@ export class ValidateInvoiceDto {
   })
   readonly id_banco: number;
 
+  @ApiProperty({
+    example: '31255',
+    required: true,
+  })
   @IsString()
   @MinLength(1)
   @MaxLength(60)

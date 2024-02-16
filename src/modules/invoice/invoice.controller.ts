@@ -18,7 +18,9 @@ import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
 import { SendPaymentDto } from './dto/send-payment.dto';
 import { EnrollmentService } from './services/enrollment.service';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller('invoice')
 export class InvoiceController {
   constructor(

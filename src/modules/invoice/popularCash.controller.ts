@@ -9,6 +9,7 @@ import {
   Res,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as moment from 'moment';
 import { IPaymentRegister } from 'src/interfaces/payment.interface';
 import { getStatusInvoicePaymentWs } from 'src/utils/webService.util';
@@ -35,6 +36,7 @@ import { InvoiceRepository } from './repositories/invoice.repository';
 import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
+@ApiTags('Paying invoices: Banco Popular')
 @Controller('caja')
 export class PopularCashController {
   private readonly logger = new Logger('POPULAR-ENDPOINT');
@@ -47,6 +49,11 @@ export class PopularCashController {
   ) {}
 
   @Get('/consultarfactura')
+  @ApiResponse({
+    status: 200,
+    description: 'The consultation is successful',
+  })
+  @ApiResponse({ status: 400, description: 'Data validation error' })
   @HttpCode(200)
   async consultarFactura(@Query() payload: ValidateInvoiceDto) {
     try {
@@ -71,55 +78,46 @@ export class PopularCashController {
     }
   }
 
-  @Get('/notificacion')
-  @HttpCode(200)
-  async notificacionFactura(@Query() payload: ValidateInvoiceDto, @Res() res) {
-    const invoice = await this.invoiceRepository.findById(
-      Number(payload.referencia_pago),
-    );
-    if (!invoice) throw new NotFoundError('Factura no encontrada');
+  // @Get('/notificacion')
+  // @HttpCode(200)
+  // async notificacionFactura(@Query() payload: ValidateInvoiceDto, @Res() res) {
+  //   const invoice = await this.invoiceRepository.findById(
+  //     Number(payload.referencia_pago),
+  //   );
+  //   if (!invoice) throw new NotFoundError('Factura no encontrada');
 
-    const responsePayment = await getStatusInvoicePaymentWs(
-      payload.referencia_pago,
-    );
-    if (!responsePayment)
-      throw new NotFoundError('No se encontraron pagos en el banco');
+  //   const responsePayment = await getStatusInvoicePaymentWs(
+  //     payload.referencia_pago,
+  //   );
+  //   if (!responsePayment)
+  //     throw new NotFoundError('No se encontraron pagos en el banco');
 
-    const registerInvoice = await this.invoiceService
-      .registerPaymentCash(responsePayment, invoice)
-      .catch(console.log);
+  //   const registerInvoice = await this.invoiceService
+  //     .registerPaymentCash(responsePayment, invoice)
+  //     .catch(console.log);
 
-    this.invoiceSysService
-      .registerInvoiceSysApolo(invoice.id)
-      .catch(console.log);
+  //   this.invoiceSysService
+  //     .registerInvoiceSysApolo(invoice.id)
+  //     .catch(console.log);
 
-    return res.send();
-  }
-
-  @Post('/reverso')
-  @HttpCode(200)
-  async reversoFactura(@Body() payload: ReversePaymentDto) {
-    try {
-      const status = await this.invoiceService.reversePayment(payload);
-
-      const response = {
-        codigo_estado: status,
-        severidad: Object.values(ESeverity)[status],
-        descripcion: MESSAGE_RESPONSE_REVERSE[status],
-      };
-
-      return response;
-    } catch (error) {
-      this.logger.warn(error);
-      return {
-        descripcion: MESSAGE_RESPONSE_REVERSE[2],
-        severidad: ESeverity.ERROR,
-        codigo_estado: EResposeStatusCode.ERROR,
-      };
-    }
-  }
+  //   return res.send();
+  // }
 
   @UseInterceptors(RequesLogtInterceptor)
+  @ApiHeader({
+    name: 'X-Token',
+    description:
+      'Token required for authentication, use: qwer in test environment',
+    required: true,
+    example: 'qwer',
+  })
+  @ApiResponse({ status: 403, description: 'Data validation error' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: 200,
+    description: 'The consultation is successful',
+  })
+  @HttpCode(200)
   @Post('/registrarpago')
   async registrarFactura(@Body() payload: PopularRegisterPaymentDto) {
     try {
@@ -163,6 +161,42 @@ export class PopularCashController {
         descripcion: ERegisterDescription.ERROR,
         severidad: ESeverity.ERROR,
         codigo_estado: ESeverityCode.ERROR,
+      };
+    }
+  }
+
+  @ApiHeader({
+    name: 'X-Token',
+    description:
+      'Token required for authentication, use: qwer in test environment',
+    required: true,
+    example: 'qwer',
+  })
+  @ApiResponse({ status: 403, description: 'Data validation error' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: 200,
+    description: 'The consultation is successful',
+  })
+  @Post('/reverso')
+  @HttpCode(200)
+  async reversoFactura(@Body() payload: ReversePaymentDto) {
+    try {
+      const status = await this.invoiceService.reversePayment(payload);
+
+      const response = {
+        codigo_estado: status,
+        severidad: Object.values(ESeverity)[status],
+        descripcion: MESSAGE_RESPONSE_REVERSE[status],
+      };
+
+      return response;
+    } catch (error) {
+      this.logger.warn(error);
+      return {
+        descripcion: MESSAGE_RESPONSE_REVERSE[2],
+        severidad: ESeverity.ERROR,
+        codigo_estado: EResposeStatusCode.ERROR,
       };
     }
   }

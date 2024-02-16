@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import * as moment from 'moment';
 import {
   EResponseDescription,
@@ -38,6 +39,7 @@ import { ConsultInvoiceService } from './services/consultInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 
 @UseFilters(HttpExceptionFilter)
+@ApiExcludeController(true)
 @Controller('caja/bbva')
 export class BbvaCashController {
   constructor(
