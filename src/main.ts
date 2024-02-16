@@ -22,6 +22,7 @@ async function bootstrap() {
     .setTitle('API ITP')
     .setDescription('Basic documentation for barcode payment implementation')
     .setVersion('1.0')
+    .addServer('https://staging.itp.edu.co/', 'Staging')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v2/api-docs', app, document);
