@@ -203,7 +203,9 @@ export class EnrollmentService {
         fecFinInsNuevos: period.fecFinInsNuevos,
       };
     } catch (error) {
-      await queryRunner.release();
+      if (!queryRunner.isReleased) {
+        await queryRunner.release();
+      }
       throw new Error('Error al generar las fechas de matricula');
     }
   }
