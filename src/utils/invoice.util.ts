@@ -20,9 +20,7 @@ export const generateDescriptionSys = (payload: IDescriptionSys): string => {
 };
 
 //esto solo puede funcionar si el aumento solo corresponde a la matricula extraordinaria
-export const calcularTotales = (
-  detalle: DetailInvoice[]
-): ITotales => {
+export const calcularTotales = (detalle: DetailInvoice[]): ITotales => {
   const totalExtraordinario = detalle
     .map(({ valorUnidad, cantidad, aumento, descuento }) => {
       const subtotal = valorUnidad * cantidad;
@@ -126,10 +124,10 @@ export const generateCodeInvoice = (info: IStudent): string => {
   });
 };
 
-export const generateEndDatePayment = (): Date => {
+export const generateEndDatePayment = (months: number = 1): Date => {
   const currentDate = new Date();
   const dt = new Date();
-  const month = dt.getMonth() + 1;
+  const month = dt.getMonth() + months;
   const year = dt.getFullYear();
   const day = dt.getDay();
   const daysInMonth = new Date(year, month, 0).getDate();

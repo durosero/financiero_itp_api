@@ -231,7 +231,10 @@ export class GenerateInvoiceService {
       return compileHBS(pathTemplateBody, dataReport);
     }
 
-    const limitDate = generateEndDatePayment();
+    const limitDate =
+      invoice.fechaLimite.getTime() >= generateEndDatePayment().getTime()
+        ? invoice.fechaLimite
+        : generateEndDatePayment();
 
     const barcodeOrd = generarCodigoBarras({
       limitDate,
