@@ -172,13 +172,13 @@ export class InvoiceService {
         invoice,
       );
       await queryRunner.commitTransaction();
-      await queryRunner.release();
       return true;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       return false;
+    } finally {
+      if (!queryRunner.isReleased) await queryRunner.release();
     }
   }
 
@@ -248,13 +248,13 @@ export class InvoiceService {
         invoice,
       );
       await queryRunner.commitTransaction();
-      await queryRunner.release();
       return true;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       return false;
+    } finally {
+      if (!queryRunner.isReleased) await queryRunner.release();
     }
   }
 
@@ -358,13 +358,13 @@ export class InvoiceService {
       await queryRunner.manager.insert(InvoiceDiscounts, insertDiscounts);
 
       await queryRunner.commitTransaction();
-      await queryRunner.release();
       return true;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       return false;
+    } finally {
+      if (!queryRunner.isReleased) await queryRunner.release();
     }
   }
 
@@ -393,13 +393,13 @@ export class InvoiceService {
       });
 
       await queryRunner.commitTransaction();
-      await queryRunner.release();
       return true;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       return false;
+    } finally {
+      if (!queryRunner.isReleased) await queryRunner.release();
     }
   }
 

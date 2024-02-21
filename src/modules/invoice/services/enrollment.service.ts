@@ -32,7 +32,7 @@ export class EnrollmentService {
       INFO_MATRICULA_SQL,
       [matriculaId],
     );
-    await queryRunner.release();
+    if (!queryRunner.isReleased) await queryRunner.release();
 
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 

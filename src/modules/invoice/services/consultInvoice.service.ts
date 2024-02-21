@@ -236,7 +236,7 @@ export class ConsultInvoiceService {
       INFO_MATRICULA_SQL,
       [params.matriculaId],
     );
-    await queryRunner.release();
+    if (!queryRunner.isReleased) await queryRunner.release();
 
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 
@@ -312,7 +312,7 @@ export class ConsultInvoiceService {
       [params.matriculaId],
     );
 
-    await queryRunner.release();
+    if (!queryRunner.isReleased) await queryRunner.release();
 
     if (!infoMatricula) throw new NotFoundError('No se encontro la matricula');
 

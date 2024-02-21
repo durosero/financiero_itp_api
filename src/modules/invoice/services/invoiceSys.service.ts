@@ -95,7 +95,7 @@ export class InvoiceSysService {
       await this.createInvoiceSys(queryRunner, invoice, codTer);
 
       await queryRunner.commitTransaction();
-      await queryRunner.release();
+      if (!queryRunner.isReleased) await queryRunner.release();
       this.invoiceRepository
         .updateStatusVerifySys(ESysApoloStatus.REGISTRADO, invoiceId)
         .catch(console.log);
@@ -104,7 +104,7 @@ export class InvoiceSysService {
       console.log(error.toString());
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
-        await queryRunner.release();
+        if (!queryRunner.isReleased) await queryRunner.release();
       }
 
       throw new HttpException(
