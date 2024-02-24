@@ -26,9 +26,9 @@ export enum ESeverity {
 }
 
 export enum ERegisterDescription {
-  INFORMATIVE = 'Se realizó exitosamente la actualización del pago.',
-  WARNING = 'No se pudo realizar la actualización del pago.',
-  ERROR = 'Ocurrió un error inesperado en la operación.',
+  INFORMATIVE = 'Se realizo exitosamente la actualizacion del pago.',
+  WARNING = 'No se pudo realizar la actualizacion del pago.',
+  ERROR = 'Ocurrio un error inesperado en la operacion.',
 }
 
 export enum ESeverityCode {

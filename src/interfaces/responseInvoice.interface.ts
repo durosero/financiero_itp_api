@@ -26,7 +26,7 @@ export enum EResposeStatusCode {
 export enum EResponseDescription {
   OK = 'Exitoso',
   WARNING = 'Factura no disponible para pago',
-  ERROR = 'Ocurrió́ un error inesperado en la operación',
+  ERROR = 'Ocurrio un error inesperado en la operacion',
 }
 
 export enum EStatusLog {

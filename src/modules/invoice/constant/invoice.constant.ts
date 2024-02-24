@@ -1,6 +1,6 @@
 // please never change the order of this arrray
 export const MESSAGE_RESPONSE_REVERSE = [
-  'Se realizó exitosamente el reverso del pago.',
+  'Se realizo exitosamente el reverso del pago.',
   'No se pudo realizar el reverso del pago.',
-  'Ocurrió un error inesperado en la operación.',
+  'Ocurrio un error inesperado en la operacion.',
 ];
