@@ -10,6 +10,7 @@ import { IDescriptionSys } from '../../../interfaces/payment.interface';
 import {
   calcularSubTotal,
   generateDescriptionSys,
+  llenarSubTotal,
 } from '../../../utils/invoice.util';
 import { getVerificationGigit } from '../../../utils/nitConverter.util';
 import {
@@ -144,7 +145,12 @@ export class InvoiceSysService {
   }
 
   async createInvoiceSys(dbSys: QueryRunner, invoice: Invoice, codTer: string) {
-    const { jsonResponse, categoryInvoice, detailInvoices } = invoice;
+    const { jsonResponse, categoryInvoice } = invoice;
+    const detailInvoices =
+      invoice.detailInvoices.filter((detailInvoice) => {
+        return calcularSubTotal(detailInvoice) > 0;
+      }) || [];
+
     if (!jsonResponse)
       throw new NotFoundError('Falta información de matricula en la factura ');
 
@@ -211,6 +217,7 @@ export class InvoiceSysService {
 
     await dbSys.manager.insert(InvoiceSys, insertInvoice);
     let idDet = codDetInvoiceQuery[0].cod_det_factura ?? 0;
+
     const inserDetailInvoice = detailInvoices.map<
       DeepPartial<DetailInvoiceSys>
     >((detail) => {
