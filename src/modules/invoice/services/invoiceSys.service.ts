@@ -66,6 +66,12 @@ export class InvoiceSysService {
       const { person, id: invoiceId } = invoice;
       let codTer: string = '00000';
 
+      if (!person.codMunicipio) {
+        throw new UnprocessableEntity(
+          `El estudiante debe tener municipio de residencia configurado`,
+        );
+      }
+
       const [invoiceSys] = await this.invoiceSysRepository?.find({
         where: { numRecibo: invoiceId },
       });
@@ -129,8 +135,8 @@ export class InvoiceSysService {
       nomTercero: fullName.trim(),
       priApellido: apellido1,
       segApellido: apellido2 ?? '',
-      priNombre: nombre1.split(' ')[0] ?? '',
-      otrNombre: nombre2.split(' ')[0] ?? '',
+      priNombre: nombre1?.split(' ')[0] ?? '',
+      otrNombre: nombre2?.split(' ')[0] ?? '',
       dirTercero: person.direccion,
       telTercero: person.phone,
       ideMun: person.codMunicipio,
