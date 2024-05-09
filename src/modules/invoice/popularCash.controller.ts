@@ -60,11 +60,31 @@ export class PopularCashController {
       const invoice = await this.consultInvoiceService.searchInvoiceForPayment(
         Number(payload.referencia_pago),
       );
+
+      const dateInvoice = moment(invoice.fechaLimite || new Date()).startOf(
+        'day',
+      );
+      const dateCurrent = moment(new Date()).startOf('day');
+
+      if (dateCurrent > dateInvoice) {
+        return {
+          valor_factura: 0,
+          descripcion_estado: EResponseDescription.WARNING,
+          codigo_estado: EResposeStatusCode.WARNING,
+          fecha_limite_pago: moment(invoice.fechaLimite || new Date()).format(
+            'DD/MM/YYYY',
+          ),
+          descripcion_general: 'Factura vencida',
+        };
+      }
+
       const response: IResponseInvoice = {
         valor_factura: invoice.valor,
         descripcion_estado: EResponseDescription.OK,
         codigo_estado: EResposeStatusCode.OK,
-        fecha_limite_pago: moment(invoice.fechaLimite).format('DD/MM/YYYY'),
+        fecha_limite_pago: moment(invoice.fechaLimite || new Date()).format(
+          'DD/MM/YYYY',
+        ),
       };
       return response;
     } catch (error) {
@@ -126,6 +146,19 @@ export class PopularCashController {
       );
 
       if (!invoice) throw new NotFoundError('Factura no encontrada');
+
+      const dateInvoice = moment(invoice.fechaLimite || new Date()).startOf(
+        'day',
+      );
+      const dateCurrent = moment(new Date()).startOf('day');
+
+      if (dateCurrent > dateInvoice) {
+        return {
+          descripcion: ERegisterDescription.WARNING,
+          severidad: ESeverity.WARNING,
+          codigo_estado: ESeverityCode.WARNING,
+        };
+      }
 
       const payloadRegister: IPaymentRegister = {
         date: payload.fecha_pago,
