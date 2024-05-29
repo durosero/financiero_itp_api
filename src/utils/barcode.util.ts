@@ -18,8 +18,8 @@ export const generarCodigoBarrasString = ({
   let valor390n: string = value.toString();
   const fecha96: string = moment(limitDate).format('YYYYMMDD');
 
-  const length8020: number = 12;
-  const length390n: number = 10;
+  const length8020 = 12;
+  const length390n = 14;
 
   if (referencia8020.length > length8020) {
     throw new Error('El codigo de referencia supera el máximo permitido');
