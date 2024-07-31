@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmpty, isNull } from 'lodash';
+import * as moment from 'moment';
 import { IGenerateInvoice } from 'src/interfaces/invoice.interface';
 import { DataSource, Repository } from 'typeorm';
 import { NotFoundError } from '../../../classes/httpError/notFounError';
@@ -207,6 +208,9 @@ export class ConsultInvoiceService {
       }),
     );
     const { totalExtraordinario: total } = calcularTotales(detailInvoice);
+
+    const generateEnd = generateEndDatePayment();
+
     return this.invoiceRepository.create({
       estadoId: EStatusInvoice.PAGO_INICADO,
       estudianteId: infoEstudiante.ide_persona,
@@ -353,14 +357,17 @@ export class ConsultInvoiceService {
       .filter((discount) => discount.accion == '0')
       .reduce((a, b) => a + b.porcentaje, 0);
 
-    let descuentoExtra: number = discounts
+    const descuentoExtra: number = discounts
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
 
-    if (
-      currenDate.getTime() > studentType.fechaFinMatricula.getTime() &&
-      !isNull(studentType.fechaFinMatricula)
-    ) {
+    const momentCurrent = moment().utcOffset(0);
+
+    const momentDb = moment(studentType.fechaFinMatricula)
+      .utcOffset(0)
+      .set({ hour: 23, minute: 59, second: 59 });
+
+    if (momentCurrent > momentDb && !isNull(studentType.fechaFinMatricula)) {
       aumentoExtra = aumentoExtra + config.porcentajeExt;
     }
 
