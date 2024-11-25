@@ -33,7 +33,6 @@ import { GenerateInvoiceDto } from '../dto/generate-invoice.dto';
 import { DetailInvoice } from '../entities/detailInvoice.entity';
 import { UniversityPeriod } from '../entities/univsityPeriod.entity';
 import { ECategoryInvoice } from '../enums/invoice.enum';
-import { ConfigRepository } from '../repositories/config.repository';
 import { DiscountRepository } from '../repositories/discount.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { PackageRepository } from '../repositories/package.repository';
@@ -171,12 +170,12 @@ export class GenerateInvoiceService {
     if (invoice.categoriaPagoId == ECategoryInvoice.MATRICULA) {
       invoice.detailInvoices = llenarSubTotalSinAumento(detailInvoices);
 
-      const barcodeOrd = generarCodigoBarras({
+      const barcodeOrd = await generarCodigoBarras({
         limitDate: studentType?.fechaFinMatricula,
         reference: invoice.id.toString(),
         value: totalOrdinario,
       });
-      const barcodeExtra = generarCodigoBarras({
+      const barcodeExtra = await generarCodigoBarras({
         limitDate: studentType.fechaFinMatriculaExt,
         reference: invoice.id.toString(),
         value: totalExtraordinario,
@@ -184,8 +183,8 @@ export class GenerateInvoiceService {
 
       const dataReport: IInvicePdfParams = {
         ...invoice,
-        barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
-        barcodeExt: !hasPayment ? barcodeExtra.barcodeSvg : '',
+        barcodeOrd: !hasPayment ? barcodeOrd.barcodeBase64 : '',
+        barcodeExt: !hasPayment ? barcodeExtra.barcodeBase64 : '',
         infoStudent: info_cliente,
         discounts,
         totalOrdinario,
@@ -205,7 +204,7 @@ export class GenerateInvoiceService {
     }
 
     if (invoice.categoriaPagoId == ECategoryInvoice.INSCRIPCION) {
-      const barcodeOrd = generarCodigoBarras({
+      const barcodeOrd = await generarCodigoBarras({
         limitDate: studentType.fecFinInsNuevos ?? generateEndDatePayment(),
         reference: invoice.id.toString(),
         value: totalOrdinario,
@@ -213,7 +212,7 @@ export class GenerateInvoiceService {
 
       const dataReport: IInvicePdfParams = {
         ...invoice,
-        barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
+        barcodeOrd: !hasPayment ? barcodeOrd.barcodeBase64 : '',
         infoStudent: info_cliente,
         discounts,
         totalOrdinario,
@@ -233,7 +232,7 @@ export class GenerateInvoiceService {
 
     const limitDate = invoice.fechaLimite ?? generateEndDatePayment();
 
-    const barcodeOrd = generarCodigoBarras({
+    const barcodeOrd = await generarCodigoBarras({
       limitDate,
       reference: invoice.id.toString(),
       value: totalOrdinario,
@@ -241,7 +240,7 @@ export class GenerateInvoiceService {
 
     const dataReport: IInvicePdfParams = {
       ...invoice,
-      barcodeOrd: !hasPayment ? barcodeOrd.barcodeSvg : '',
+      barcodeOrd: !hasPayment ? barcodeOrd.barcodeBase64 : '',
       infoStudent: info_cliente,
       totalOrdinario,
       limitDate,

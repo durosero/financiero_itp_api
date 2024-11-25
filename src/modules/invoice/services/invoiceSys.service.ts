@@ -10,7 +10,6 @@ import { IDescriptionSys } from '../../../interfaces/payment.interface';
 import {
   calcularSubTotal,
   generateDescriptionSys,
-  llenarSubTotal,
 } from '../../../utils/invoice.util';
 import { getVerificationGigit } from '../../../utils/nitConverter.util';
 import {
@@ -64,7 +63,7 @@ export class InvoiceSysService {
         throw new NotFoundError(`Factura ${invoiceIdParam} no encontrada`);
 
       const { person, id: invoiceId } = invoice;
-      let codTer: string = '00000';
+      let codTer = '00000';
 
       if (!person.codMunicipio) {
         throw new UnprocessableEntity(

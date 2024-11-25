@@ -141,7 +141,7 @@
                 <td style="text-align: right">
 
 
-                    {{{barcodeOrd}}}
+                    <img src="data:image/png;base64,{{barcodeOrd}}" alt="" height="66" srcset="">
 
                 </td>
             </tr>
@@ -166,7 +166,7 @@
                     {{#ifCond hasPayment true }}
                     <small style="background-color: #64dd17; padding: 5px;">Esta factura ya ha sido pagada</small>
                     {{/ifCond}}
-                    {{{barcodeExt}}}
+                    <img src="data:image/png;base64,{{barcodeExt}}" alt="" height="66" srcset="">
 
 
                 </td>

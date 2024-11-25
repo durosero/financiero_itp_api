@@ -19,5 +19,6 @@ export interface IBarcodeInput {
 export interface IBarcodeOutput {
   barcode: string;
   barcodeText: string;
-  barcodeSvg?: string;
+  barcodeBase64?: string;
+  buffer?: Buffer;
 }

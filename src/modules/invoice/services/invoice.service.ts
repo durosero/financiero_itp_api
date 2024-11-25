@@ -91,7 +91,6 @@ export class InvoiceService {
       try {
         await this.registerDiscuountInvoice(payload.invoiceId, discounts);
         const buffer = await this.getPdfPaymentReceipt(searchData.invoiceId);
-
         const attachment: Mail.Attachment = {
           content: buffer,
           filename: `${person.id}-${searchData.transactionCode}.pdf`,
@@ -405,7 +404,7 @@ export class InvoiceService {
 
   async sendPaymentEmail(
     invoiceId: number,
-    important: boolean = false,
+    important?: boolean,
   ): Promise<SentMessageInfo> {
     const invoice = await this.invoiceRepository.findOneForEmail(invoiceId);
 

@@ -192,11 +192,11 @@ export class ConsultInvoiceService {
       info_cliente: params.infoEstudiante,
     };
 
-    let aumentoExtra: number = discounts
+    const aumentoExtra: number = discounts
       .filter((discount) => discount.accion == '0')
       .reduce((a, b) => a + b.porcentaje, 0);
 
-    let descuentoExtra: number = discounts
+    const descuentoExtra: number = discounts
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
     const detailInvoice = this.detailInvoiceRepository.create(
@@ -272,11 +272,11 @@ export class ConsultInvoiceService {
 
     const { fecFinInsNuevos } = period;
 
-    let aumentoExtra: number = discounts
+    const aumentoExtra: number = discounts
       .filter((discount) => discount.accion == '0')
       .reduce((a, b) => a + b.porcentaje, 0);
 
-    let descuentoExtra: number = discounts
+    const descuentoExtra: number = discounts
       .filter((discount) => discount.accion == '1')
       .reduce((a, b) => a + b.porcentaje, 0);
     const detailInvoice = this.detailInvoiceRepository.create(
@@ -324,7 +324,7 @@ export class ConsultInvoiceService {
     if (!config) throw new NotFoundError('No se encontro la configuracion');
 
     let quantity = 0;
-    let codPaquete: string = '0';
+    let codPaquete = '0';
     if (
       infoMatricula.nro_creditos > config.minCreditos ||
       infoMatricula.nro_creditos == 0

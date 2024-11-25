@@ -1,4 +1,5 @@
 import * as JsBarcode from 'jsbarcode';
+import * as bwipjs from 'bwip-js';
 import {
   IBarcodeInput,
   IBarcodeOutput,
@@ -60,38 +61,35 @@ export const dividirCodigoBarrasText = (cadena: string) => {
   return { convenio415, referencia8020, valor3900, fecha96 };
 };
 
-export const generarCodigoBarras = ({
+export const generarCodigoBarras = async ({
   limitDate,
   reference,
   value,
-}: IBarcodeInput): IBarcodeOutput => {
+}: IBarcodeInput): Promise<IBarcodeOutput> => {
   const { barcode, barcodeText } = generarCodigoBarrasString({
     limitDate,
     reference,
     value,
   });
-  const xmlSerializer = new XMLSerializer();
-  const document = new DOMImplementation().createDocument(
-    'http://www.w3.org/1999/xhtml',
-    'html',
-    null,
-  );
-  const svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-  JsBarcode(svgNode, barcode, {
-    xmlDocument: document,
-    height: 50,
-    width: 1.13,
-    fontSize: 10,
-    text: barcodeText,
-    margin: 2,
+  const bufferCode = await bwipjs.toBuffer({
+    bcid: 'gs1-128', // Barcode type
+    text: barcodeText, // Text to encode
+    height: 15, // Bar height, in millimeters
+    includetext: true, // Show human-readable text
+    textxalign: 'center', // Always good to set this
+    alttext: barcodeText,
+    width: 108,
+    scaleX: 5,
+    scaleY: 5,
+    textyoffset: 2,
+    textxoffset: 1,
+    textsize: 9,
   });
-
-  const svgText = xmlSerializer.serializeToString(svgNode);
 
   return {
     barcode,
     barcodeText,
-    barcodeSvg: svgText,
+    barcodeBase64: bufferCode.toString('base64'),
   };
 };
