@@ -8,15 +8,14 @@ import { join, resolve } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import config from './config/config';
-import { getEnvirontment } from './config/environments';
+import { getEnvironment } from './config/environments';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { TasksService } from './services/tasks.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: getEnvirontment(),
-      load: [config],
+      envFilePath: getEnvironment(),
       isGlobal: true,
     }),
 
@@ -34,7 +33,7 @@ import { TasksService } from './services/tasks.service';
       synchronize: false,
       logging: 'all',
       retryAttempts: 30,
-      insecureAuth:true
+      insecureAuth: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'assets'),

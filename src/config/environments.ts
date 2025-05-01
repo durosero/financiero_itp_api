@@ -8,7 +8,7 @@ export const environments: {
   ['pro']: '.production.env',
 };
 
-export function getEnvirontment() {
+export function getEnvironment() {
   const env = process.env.NODE_ENV ?? 'dev';
   return environments[env] ?? '.env';
 }
