@@ -38,6 +38,7 @@ import { GenerateInvoiceService } from './services/generateInvoice.service';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceSysService } from './services/invoiceSys.service';
 import { RequestLogService } from './services/requestLog.service';
+import { google } from 'googleapis';
 
 @Module({
   controllers: [InvoiceController, PopularCashController, BbvaCashController],
@@ -52,9 +53,14 @@ import { RequestLogService } from './services/requestLog.service';
     ConfigRepository,
     DiscountRepository,
     RequestLogService,
-    EnrollmentService
+    EnrollmentService,
   ],
-  exports: [InvoiceRepository, InvoiceSysService, InvoiceService, DetailPaymentRepository],
+  exports: [
+    InvoiceRepository,
+    InvoiceSysService,
+    InvoiceService,
+    DetailPaymentRepository,
+  ],
   imports: [
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
@@ -74,32 +80,50 @@ import { RequestLogService } from './services/requestLog.service';
       Discounts,
       DiscountCategory,
       UniversityPeriod,
-      InvoiceDiscounts, 
-      RequestLog
+      InvoiceDiscounts,
+      RequestLog,
     ]),
 
     MailerModule.forRootAsync({
-      useFactory: async () => ({
-        transport: {
-          host: 'smtp.gmail.com',
-          port: 465,
-          secure: true,
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL ?? '',
-            pass: process.env.EMAIL_PASS ?? '',
+      useFactory: async () => {
+        const oAuth2Client = new google.auth.OAuth2(
+          process.env.CLIENT_ID,
+          process.env.CLIENT_SECRET,
+          process.env.REDIRECT_URI,
+        );
+
+        oAuth2Client.setCredentials({
+          refresh_token: process.env.REFRESH_TOKEN,
+        });
+
+        const accessToken = (await oAuth2Client.getAccessToken()).token;
+
+        return {
+          transport: {
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+              type: 'OAuth2',
+              user: process.env.EMAIL ?? '',
+              clientId: process.env.CLIENT_ID,
+              clientSecret: process.env.CLIENT_SECRET,
+              refreshToken: process.env.REFRESH_TOKEN,
+              accessToken,
+            },
           },
-        },
-        defaults: {
-          from: `Sigedin-ITP <${AUTH_EMAIL.USER}>`,
-        },
-        template: {
-          dir: join(__dirname, 'templates'),
-          options: {
-            strict: false,
+          defaults: {
+            from: `Sigedin-ITP <${process.env.EMAIL}>`,
           },
-        },
-      }),
+          template: {
+            dir: join(__dirname, 'templates'),
+            options: {
+              strict: false,
+            },
+          },
+        };
+      },
     }),
   ],
 })
