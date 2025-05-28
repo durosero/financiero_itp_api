@@ -12,7 +12,7 @@ export class AppService {
   private version: number = new Date().getTime();
   getHello(): object {
     return {
-      message: 'Hola mundo',
+      message: 'Hola mundo v2',
       developer: 'Duvan Rosero',
       version: this.version,
       error: false,
