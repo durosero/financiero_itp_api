@@ -44,7 +44,7 @@ export class DetailPaymentRepository extends Repository<DetailPayment> {
       .getOne();
   }
 
-  findPaymentsOkByDate(date: Date = new Date(), limit: number = 20) {
+  findPaymentsOkByDate(date: Date = new Date(), limit = 20) {
     return this.repository
       .createQueryBuilder('pm')
       .select('pm')
