@@ -10,7 +10,6 @@ export class EmailService {
     enviar_a: string[],
     asunto: string,
     mensaje: string,
-    key: string,
   ): Promise<SentMessageInfo> {
     const mailOptions: ISendMailOptions = {
       to: process.env.NODE_ENV != 'pro' ? process.env.EMAIL_TEST : enviar_a,

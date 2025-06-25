@@ -14,11 +14,11 @@ export class EmailController {
       ? data.enviar_a.split(',').map((email) => email.trim())
       : [];
 
-    return this.emailService.sendEmail(
-      enviarA,
-      data.asunto,
-      data.mensaje,
-      data.key,
-    );
+    try {
+      await this.emailService.sendEmail(enviarA, data.asunto, data.mensaje);
+      return { error: false, message: 'Correo enviado Correctamente.' };
+    } catch (error) {
+      return { error: true, message: 'Error al enviar correo.' };
+    }
   }
 }
