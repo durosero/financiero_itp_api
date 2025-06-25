@@ -5,4 +5,5 @@ export const AUTH_EMAIL = {
   CLIENT_SECRET: process.env.CLIENT_SECRET ?? '',
   REFRESH_TOKEN: process.env.REFRESH_TOKEN ?? '',
   REDIRECT_URI: process.env.REDIRECT_URI ?? '',
+  EMAIL_KEY: process.env.EMAIL_KEY ?? '',
 };

@@ -11,6 +11,7 @@ import config from './config/config';
 import { getEnvironment } from './config/environments';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { TasksService } from './services/tasks.service';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { TasksService } from './services/tasks.service';
     }),
     ScheduleModule.forRoot(),
     InvoiceModule,
+    EmailModule,
   ],
   controllers: [AppController],
   exports: [],
