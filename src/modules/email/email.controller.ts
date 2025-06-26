@@ -1,4 +1,10 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { EmailService } from './email.service';
 import { SendEmailDto } from './dto/send-email.dto';
 import { ApiKeyGuard } from '../../guards/api-key.guard';
@@ -15,6 +21,20 @@ export class EmailController {
       : [];
 
     try {
+      if (enviarA.length === 0) {
+        throw new BadRequestException('Debe proporcionar al menos un correo.');
+      }
+
+      // RegEx básica de validación de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmails = enviarA.filter((email) => !emailRegex.test(email));
+
+      if (invalidEmails.length > 0) {
+        throw new BadRequestException(
+          `Los siguientes correos no son válidos: ${invalidEmails.join(', ')}`,
+        );
+      }
+
       await this.emailService.sendEmail(enviarA, data.asunto, data.mensaje);
       return { error: false, message: 'Correo enviado Correctamente.' };
     } catch (error) {

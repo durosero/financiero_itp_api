@@ -6,7 +6,6 @@ export class SendEmailDto {
   from_name: string;
 
   @IsString()
-  @IsEmail()
   enviar_a: string;
 
   @IsString()
