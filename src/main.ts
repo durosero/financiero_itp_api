@@ -10,6 +10,10 @@ export const PREFIX = process.env.GLOBAL_PEFIX ?? '/api/v2';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  // Enable body-parser to handle urlencoded content
+  app.use(bodyParser.urlencoded({ extended: true }));
+  // Enable para application/json
+  app.use(bodyParser.json());
   app.setGlobalPrefix(PREFIX);
 
   app.useGlobalPipes(
@@ -19,8 +23,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  app.use(bodyParser.urlencoded({ extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('API ITP')
