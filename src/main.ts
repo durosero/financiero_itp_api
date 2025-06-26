@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as bodyParser from 'body-parser';
 
 export const PORT = process.env.PORT;
 export const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
@@ -15,8 +16,11 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
+
+  app.use(bodyParser.urlencoded({ extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('API ITP')
