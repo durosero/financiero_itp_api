@@ -1,11 +1,10 @@
-import * as JsBarcode from 'jsbarcode';
 import * as bwipjs from 'bwip-js';
 import {
   IBarcodeInput,
   IBarcodeOutput,
 } from 'src/interfaces/bbvaCash.interface';
-import { DOMImplementation, XMLSerializer } from 'xmldom';
 import * as moment from 'moment';
+import { ConfigHelper } from './configHelper.util';
 
 export const generarCodigoBarrasString = ({
   limitDate,
@@ -13,7 +12,7 @@ export const generarCodigoBarrasString = ({
   value,
 }: IBarcodeInput): IBarcodeOutput => {
   // https://gs1co.org/servicios/codigos-de-barras/calculo-del-digito-de-control
-  const convenio415: string = process.env.CODIGO_CONVENIO ?? '7709998885721';
+  const convenio415: string = ConfigHelper.getBarcodeGs1();
   let referencia8020: string = reference;
 
   let valor390n: string = value.toString();

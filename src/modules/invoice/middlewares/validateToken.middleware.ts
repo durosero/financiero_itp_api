@@ -2,14 +2,17 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  NestMiddleware
+  NestMiddleware,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NextFunction, Request, Response } from 'express';
 
 @Injectable()
 export class ValidateTokenMiddleware implements NestMiddleware {
+  constructor(private config: ConfigService) {}
+
   use(req: Request, res: Response, next: NextFunction) {
-    const token = process.env.BANCO_POPULAR_TOKEN || '';
+    const token = this.config.get<number>('BANCO_POPULAR_TOKEN') || '';
 
     try {
       const xTokenHeader = req.header('X-Token') || null;

@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
-  constructor(
-    @InjectEntityManager()
-    private readonly entityManager: EntityManager,
-  ) {}
+  constructor(private config: ConfigService) {}
 
   private version: number = new Date().getTime();
   getHello(): object {
@@ -16,8 +12,8 @@ export class AppService {
       developer: 'Duvan Rosero',
       version: this.version,
       error: false,
-      env: process.env.NODE_ENV,
-      base_url: process.env.BASE_URL,
+      env: this.config.get<string>('NODE_ENV'),
+      base_url: this.config.get<string>('BASE_URL'),
     };
   }
 }

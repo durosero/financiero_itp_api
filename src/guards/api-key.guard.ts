@@ -4,11 +4,14 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
-  private readonly expectedToken = process.env.EMAIL_KEY ?? '';
+  constructor(private configService: ConfigService) {}
+
+  private readonly expectedToken = this.configService.get<string>('EMAIL_KEY');
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();

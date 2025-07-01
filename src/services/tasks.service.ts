@@ -4,7 +4,6 @@ import { InvoiceRepository } from 'src/modules/invoice/repositories/invoice.repo
 import { CronExpression } from '../constants/cronExpression.enum';
 import { CronJob } from 'cron';
 import { InvoiceSysService } from 'src/modules/invoice/services/invoiceSys.service';
-import { getStatusInvoicePaymentWs } from 'src/utils/webService.util';
 import { InvoiceService } from 'src/modules/invoice/services/invoice.service';
 import { DetailPaymentRepository } from 'src/modules/invoice/repositories/detailPayment.repository';
 

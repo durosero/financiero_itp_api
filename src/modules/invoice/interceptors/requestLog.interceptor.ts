@@ -2,16 +2,19 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  Logger,
   NestInterceptor,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Observable, tap } from 'rxjs';
 import { IRequestLog } from 'src/interfaces/responseInvoice.interface';
 import { RequestLogService } from '../services/requestLog.service';
 
 @Injectable()
 export class RequesLogtInterceptor implements NestInterceptor {
-  constructor(private readonly requestLogService: RequestLogService) {}
+  constructor(
+    private readonly requestLogService: RequestLogService,
+    private config: ConfigService,
+  ) {}
 
   intercept(
     context: ExecutionContext,
@@ -28,7 +31,7 @@ export class RequesLogtInterceptor implements NestInterceptor {
           clientIp: headers['x-forwarded-for'] || headers['x-real-ip'],
           headerRequest: headers,
           invoiceId: body?.Referencia_pago,
-          urlService: `${process.env.BASE_URL}${url}`,
+          urlService: `${this.config.get<string>('BASE_URL')}${url}`,
           statusCode: response.statusCode ?? 0,
         };
 

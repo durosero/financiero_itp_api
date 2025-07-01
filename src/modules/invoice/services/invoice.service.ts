@@ -46,6 +46,7 @@ import { DiscountRepository } from '../repositories/discount.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
 import { InvoiceSysService } from './invoiceSys.service';
 import { SentMessageInfo } from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class InvoiceService {
   constructor(
@@ -59,6 +60,7 @@ export class InvoiceService {
 
     @InjectRepository(InvoiceDiscounts)
     private invoiceDiscountsRepository: Repository<InvoiceDiscounts>,
+    private configService: ConfigService,
   ) {}
 
   async registerPaymentCash(payload: IPaymentRegister, invoice: Invoice) {
@@ -98,8 +100,8 @@ export class InvoiceService {
         };
         const mailOptions: ISendMailOptions = {
           to:
-            process.env.NODE_ENV != 'pro'
-              ? process.env.EMAIL_TEST
+            this.configService.get<string>('NODE_ENV') != 'pro'
+              ? this.configService.get<string>('EMAIL_TEST')
               : person.email,
           subject: 'Recibo de pago - Pago exitoso',
           text: messageEmailPaymentOk(
@@ -440,7 +442,10 @@ export class InvoiceService {
       contentType: 'application/pdf',
     };
     const mailOptions: ISendMailOptions = {
-      to: process.env.NODE_ENV != 'pro' ? process.env.EMAIL_TEST : person.email,
+      to:
+        this.configService.get<string>('NODE_ENV') != 'pro'
+          ? this.configService.get<string>('EMAIL_TEST')
+          : person.email,
       subject: 'Recibo de pago - Pago exitoso',
       text: messageEmailPaymentOk(
         person,

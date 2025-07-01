@@ -4,13 +4,17 @@ import {
   ArgumentsHost,
   HttpException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { IRequestLog } from 'src/interfaces/responseInvoice.interface';
 import { RequestLogService } from '../services/requestLog.service';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private readonly requestLogService: RequestLogService) {}
+  constructor(
+    private readonly requestLogService: RequestLogService,
+    private config: ConfigService,
+  ) {}
 
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -38,7 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       clientIp: headers['x-forwarded-for'] || headers['x-real-ip'],
       headerRequest: request.headers,
       invoiceId: request?.body?.Referencia_pago,
-      urlService: `${process.env.BASE_URL}${request.url}`,
+      urlService: `${this.config.get<string>('BASE_URL')}${request.url}`,
       statusCode: status,
     };
 
