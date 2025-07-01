@@ -1,18 +1,19 @@
+import { ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
 import { EConnection } from 'src/constants/database.constant';
 import { DataSource } from 'typeorm';
 
 export const databaseProviders = {
   provide: `DATA_SOURCE_${EConnection.SYSAPOLO}`,
-  useFactory: async () => {
+  useFactory: async (config: ConfigService) => {
     const dataSource = new DataSource({
       name: EConnection.SYSAPOLO,
       type: 'mssql',
-      host: process.env.MSSQL_SYSAPOLO_SERVER,
-      username: process.env.MSSQL_SYSAPOLO_USER,
-      password: process.env.MSSQL_SYSAPOLO_PASS,
-      database: process.env.MSSQL_SYSAPOLO_DATABASE,
-      port: Number(process.env.MSSQL_SYSAPOLO_PORT) || 1433,
+      host: config.get<string>('MSSQL_SYSAPOLO_SERVER'),
+      username: config.get<string>('MSSQL_SYSAPOLO_USER'),
+      password: config.get<string>('MSSQL_SYSAPOLO_PASS'),
+      database: config.get<string>('MSSQL_SYSAPOLO_DATABASE'),
+      port: Number(config.get<number>('MSSQL_SYSAPOLO_PORT')),
       entities: [
         resolve(__dirname, '../entities/SysApolo/**/*.entity{.ts,.js}'),
       ],

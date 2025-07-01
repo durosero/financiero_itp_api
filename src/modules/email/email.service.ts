@@ -1,10 +1,14 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { SentMessageInfo } from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private configService: ConfigService,
+  ) {}
 
   async sendEmail(
     enviar_a: string[],
@@ -12,7 +16,10 @@ export class EmailService {
     mensaje: string,
   ): Promise<SentMessageInfo> {
     const mailOptions: ISendMailOptions = {
-      to: process.env.NODE_ENV != 'pro' ? process.env.EMAIL_TEST : enviar_a,
+      to:
+        this.configService.get<string>('NODE_ENV') != 'pro'
+          ? this.configService.get<string>('EMAIL_TEST')
+          : enviar_a,
       subject: asunto,
       text: mensaje,
     };

@@ -28,6 +28,7 @@ import { ESysApoloStatus } from '../enums/invoice.enum';
 import { databaseProviders } from '../providers/database.provider';
 import { DetailPaymentRepository } from '../repositories/detailPayment.repository';
 import { InvoiceRepository } from '../repositories/invoice.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class InvoiceSysService {
@@ -39,8 +40,9 @@ export class InvoiceSysService {
   constructor(
     private readonly invoiceRepository: InvoiceRepository,
     private readonly detailPaymentRepository: DetailPaymentRepository,
+    private configService: ConfigService,
   ) {
-    databaseProviders.useFactory().then(
+    databaseProviders.useFactory(this.configService).then(
       (dataSource) => {
         this.invoiceSysRepository = dataSource.getRepository(InvoiceSys);
         this.detailInvoiceSysRepository =
@@ -55,7 +57,7 @@ export class InvoiceSysService {
 
   // Main register Invoice
   async registerInvoiceSysApolo(invoiceIdParam: number): Promise<boolean> {
-    const dataSource = await databaseProviders.useFactory();
+    const dataSource = await databaseProviders.useFactory(this.configService);
     const queryRunner = dataSource.createQueryRunner();
     try {
       const invoice = await this.invoiceRepository.findById(invoiceIdParam);
