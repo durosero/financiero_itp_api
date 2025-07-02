@@ -57,9 +57,7 @@ export const envValidationSchema = Joi.object({
   MSSQL_SYSAPOLO_USER: Joi.string().required(),
   MSSQL_SYSAPOLO_PASS: Joi.string().required(),
   MSSQL_SYSAPOLO_DATABASE: Joi.string().required(),
-  MSSQL_SYSAPOLO_SERVER: Joi.string()
-    .ip({ version: ['ipv4'] })
-    .required(),
+  MSSQL_SYSAPOLO_SERVER: Joi.string().required(),
   MSSQL_SYSAPOLO_PORT: Joi.number().required().default('1433'),
 });
 
