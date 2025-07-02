@@ -9,7 +9,7 @@ export class ConfigHelper {
 
   static getBaseUrl(): string {
     const url = new URL(
-      ConfigHelper.configService.get<string>('PREFIX'),
+      ConfigHelper.configService.get<string>('GLOBAL_PEFIX'),
       ConfigHelper.configService.get<string>('BASE_URL'),
     );
 
