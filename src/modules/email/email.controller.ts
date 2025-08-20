@@ -27,15 +27,9 @@ export class EmailController {
 
       // RegEx básica de validación de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const invalidEmails = enviarA.filter((email) => !emailRegex.test(email));
+      const validMails = enviarA.filter((email) => emailRegex.test(email));
 
-      if (invalidEmails.length > 0) {
-        throw new BadRequestException(
-          `Los siguientes correos no son válidos: ${invalidEmails.join(', ')}`,
-        );
-      }
-
-      await this.emailService.sendEmail(enviarA, data.asunto, data.mensaje);
+      await this.emailService.sendEmail(validMails, data.asunto, data.mensaje);
       return { error: false, message: 'Correo enviado Correctamente.' };
     } catch (error) {
       return { error: true, message: 'Error al enviar correo.' };
