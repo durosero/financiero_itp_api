@@ -248,14 +248,14 @@ export class ConsultInvoiceService {
     if (!config) throw new NotFoundError('No se encontro la configuracion');
 
     const { codPaquete } = params;
-    const codeEnum = Object.values(EPackageCode).includes(
+    const codeEnumPackage = Object.values(EPackageCode).includes(
       codPaquete as EPackageCode,
     )
       ? (codPaquete as EPackageCode)
       : EPackageCode.INSCRIPCION;
 
     const packageInvoce = await this.packageRepository.findConceptsByCode(
-      codeEnum,
+      codeEnumPackage,
     );
     if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
 
@@ -303,7 +303,7 @@ export class ConsultInvoiceService {
       valor: total,
       jsonResponse: JSON.stringify(infoClient),
       periodoId: infoMatricula.cod_periodo,
-      codPaquete: EPackageCode.INSCRIPCION,
+      codPaquete: codeEnumPackage,
       isOnline: params.isPagoOnline ? EOnlinePayment.SI : EOnlinePayment.NO,
       categoriaPagoId: categoriaId,
       fechaUpdate: new Date(),
