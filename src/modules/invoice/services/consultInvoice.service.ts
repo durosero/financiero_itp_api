@@ -247,8 +247,15 @@ export class ConsultInvoiceService {
     const config = await this.configRepository.getCurrentConfig();
     if (!config) throw new NotFoundError('No se encontro la configuracion');
 
+    const { codPaquete } = params;
+    const codeEnum = Object.values(EPackageCode).includes(
+      codPaquete as EPackageCode,
+    )
+      ? (codPaquete as EPackageCode)
+      : EPackageCode.INSCRIPCION;
+
     const packageInvoce = await this.packageRepository.findConceptsByCode(
-      EPackageCode.INSCRIPCION,
+      codeEnum,
     );
     if (!packageInvoce) throw new NotFoundError('No se encontro el paquete');
 

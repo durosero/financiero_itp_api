@@ -67,17 +67,20 @@ export const PACKAGE_TYPE = {
   INDIVIDUAL: {
     6: '1', //TECNOLOGICO
     7: '4', //PROFESIONAL
-    16: '5', //ESPECIALIZACION
+    11: '5', //ESPECIALIZACION
+    16: '33', //ESPECIALIZACION
   },
   COMPLETO: {
     6: '2', //TECNOLOGICO
     7: '3', //PROFESIONAL
+    11: '33', //ESPECIALIZACION
     16: '5', //ESPECIALIZACION
   },
 };
 
 export enum EPackageCode {
   INSCRIPCION = '6',
+  INSCRIPCION_ESPECIALIZACION = '34',
 }
 
 export enum EDiscountStatus {

@@ -78,6 +78,6 @@ export interface IStudentType {
   fechaFinMatricula: Date;
   fechaInicioMatriculaExt: Date;
   fechaFinMatriculaExt: Date;
-  fecIniInsNuevos:Date;
-  fecFinInsNuevos:Date;
+  fecIniInsNuevos: Date;
+  fecFinInsNuevos: Date;
 }
